@@ -5,5 +5,5 @@ def pages_config():
     st.set_page_config(
         page_title="StartUp USC",
         page_icon="👨‍💼",
-        
+        initial_sidebar_state="collapsed",
     )

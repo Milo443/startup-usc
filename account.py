@@ -4,6 +4,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import auth
 
+import home
+
 #credential = credentials.Certificate('startup-usc-eee3f6cf1d92.json')
 #firebase_admin.initialize_app(credential)
 
@@ -14,24 +16,15 @@ def app():
     choice = st.selectbox('Login/Signup',['Login', 'Sign Up'])
 
     def f():
-            #user = auth.get_user_by_email(email)
-            #st.success('Login Exitoso')
+            user = auth.get_user_by_email(email)
             try:
                 # Obtener el usuario por correo electrónico
-                user = auth.get_user_by_email(email)
-                
-                
-                 # Verificar la contraseña
-                expiry_duration = 3600000  # 1 hora en milisegundos
-                id_token = auth.create_session_cookie(user.uid, password, expires_in=expiry_duration)
-                decoded_token = auth.verify_id_token(id_token)
-                uid = decoded_token['uid']
-
-                if decoded_token:
-                    st.success(f'Login Exitoso para el usuario con UID: {uid}')
-                else:
-                    st.warning('La contraseña es incorrecta.')
-                    
+                st.success('Login Exitoso')
+                p = st.session_state.authenticated = True
+                #st.success(p)
+                if p == True:
+                    st.cache
+                    home.app()
             except auth.UserNotFoundError:
                 st.warning('El correo electrónico no está registrado.')
             except Exception as e:
@@ -60,6 +53,8 @@ def app():
             except Exception as e:
                 st.warning(f'Error: {e}')
 
-app() 
+
+
+
 
 
