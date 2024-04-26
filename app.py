@@ -3,7 +3,7 @@ import json
 from controller import controller
 
 
-logo_url = ('img\logo.png')
+logo_url = ('resource\img\logo.png')
 add_images = st.sidebar.image(logo_url)
 
 
@@ -16,7 +16,7 @@ def login_register():
     if choice == 'Login':
         
         email=st.text_input('Correo Electronico')
-        password = st.text_input('Contraseña', type='password')
+        #password = st.text_input('Contraseña', type='password')
     
 
         st.button('Login', on_click=controller.login(email))
@@ -29,6 +29,6 @@ def login_register():
         if st.button('Register'):
             controller.register(email,password,username)
 
-login_register()
+
 
 
