@@ -22,7 +22,7 @@ def pages_config():
         initial_sidebar_state="collapsed",
     )
 
-def login(email):
+def login(email):   
     try:
         user = auth.get_user_by_email(email=email)
         # Obtener el usuario por correo electrónico
@@ -35,10 +35,13 @@ def login(email):
         st.warning(f'Error: {e}')
 
 def register(email,password,username):
-            try:
-                user = auth.create_user(email=email, password=password, uid=username)
-                st.success('Cuenta creada con exito')
-                st.markdown('Porfavor logueate usando tu correo y contrasena')
-                st.balloons()
-            except Exception as e:
-                st.warning(f'Error: {e}')
+        try:
+            user = auth.create_user(email=email, password=password, uid=username)
+            st.success('Cuenta creada con exito')
+            st.markdown('Porfavor logueate usando tu correo y contrasena')
+            st.balloons()
+        except Exception as e:
+            st.warning(f'Error: {e}')
+
+def uploader(your_logo):
+            st.image(your_logo,width=100)

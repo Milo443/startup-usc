@@ -1,0 +1,5 @@
+
+#instalar las librerias necesarias para la ejecucion del proyecto
+pip install --upgrade openai
+pip install streamlit
+pip install firebase_admin
