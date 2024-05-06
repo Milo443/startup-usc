@@ -1,0 +1,60 @@
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<body>
+
+<div class="container-fluid">
+    <form action="/signup/" method="POST">
+        <div class="row">
+            <div class="col-md-6" style="display: flex; flex-direction: column; justify-content: center; height: 100vh">
+                <div class="card">
+                    <dib class="card-body">
+                        {% csrf_token %}
+                    <h1>Registro</h1>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password1">Password:</label>
+                        <input type="password" class="form-control" id="password1" name="password1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Confirm Password:</label>
+                        <input type="password" class="form-control" id="password2" name="password2" required>
+                    </div>  
+                    </dib>    
+                </div>
+                    
+            </div>
+
+            <div class="col-md-6" style="display: block; background-color: #141414; text-align: center;">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <img src="https://i.ibb.co/mq6pK3c/logo.jpg" alt="logo" style="max-width: 100%;">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-lg">Registrarse</button>
+                        <hr>
+                        <a href="/login/" class="">Iniciar sesión</a>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </form>
+</div>
+    
+</body>
+
+
+
+       
