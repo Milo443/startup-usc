@@ -1,0 +1,48 @@
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<body>
+
+<div class="container-fluid">
+    <form action="/login/" method="POST">
+        <div class="row">
+            <div class="col-md-6" style="display: flex; flex-direction: column; justify-content: center; height: 100vh">
+                <div class="card">
+                    <div class="card-body">
+                            {% csrf_token %}
+                        <h1>Inicio de sesion</h1>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>    
+                </div>
+                    
+            </div>
+
+            <div class="col-md-6" style="display: block; background-color: #141414; text-align: center;">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <img src="https://i.ibb.co/mq6pK3c/logo.jpg" alt="logo" style="max-width: 100%;">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-lg">Iniciar sesión</button>
+                        <hr>
+                        <a href="/signup/" class="">Registrarse</a>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </form>
+</div>
+    
+</body>
