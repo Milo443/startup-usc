@@ -8,8 +8,6 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 
-from .models import Startup
-
 # Create your views here.
 def home(request):
         return render(request, 'home.html', {})
@@ -27,7 +25,7 @@ def signup(request):
                                 user.save()
                                 return redirect('/login/')
                         except Exception as e:
-                                return HttpResponse('Usuario ya existe')
+                                return HttpResponse(e)
                 return HttpResponse('Password no es identico')
 
 def user_login(request):
@@ -66,9 +64,6 @@ def crear_proyecto(request):
                 categoria = request.POST['categoria']
                 imagen = request.FILES['imagen']
                 # Assuming you have a model called 'Proyecto' in your models.py file
-
-                proyecto = Startup(nombre=nombre, descripcion=descripcion, categoria=categoria, imagen=imagen, username=request.user)
-                proyecto.save()
 
                 return redirect('/main/')
         return render(request, 'components/form_proyecto.html', {})
