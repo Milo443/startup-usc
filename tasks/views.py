@@ -1,10 +1,14 @@
 
 from django.shortcuts import render
-from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
+from django.contrib.auth import login, logout as auth_logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
+
+from .models import Startup
 
 # Create your views here.
 def home(request):
@@ -34,19 +38,54 @@ def user_login(request):
                 username = request.POST['username']
                 password = request.POST['password']
                 user = authenticate(username=username, password=password)
-                print(user)
                 if user is not None:
-                        login(request, user)
-                        return redirect('/main/')
+                        staff = user.is_staff
+                        if staff:
+                                return redirect('/administrator/')
+                        else:
+                                login(request, user)
+                                return redirect('/main/')
                 else:
-                        return HttpResponse('Usuario no existe')
+                        messages.error(request, 'Usuario o contraseña incorrecta')
+                        return redirect('/login/')
 
 def main(request):
-        return render(request, 'main.html', {})
+        user_login = request.user
+        if user_login.is_authenticated:
+                username = user_login.username
+                user = User.objects.get(username=username)
+                return render(request, 'main.html', {})
+        else:
+                return HttpResponse('Usuario no autenticado')
 
+
+def crear_proyecto(request):
+        if request.method == 'POST':
+                nombre = request.POST['nombre']
+                descripcion = request.POST['descripcion']
+                categoria = request.POST['categoria']
+                imagen = request.FILES['imagen']
+                # Assuming you have a model called 'Proyecto' in your models.py file
+
+                proyecto = Startup(nombre=nombre, descripcion=descripcion, categoria=categoria, imagen=imagen, username=request.user)
+                proyecto.save()
+
+                return redirect('/main/')
+        return render(request, 'components/form_proyecto.html', {})
 
 def logout(request):
-    if 'id_token' in request.session:
-        del request.session['id_token']
-    
-    return redirect('/')
+        auth_logout(request)
+        return redirect('/login/')
+
+def administrator(request):
+        users = User.objects.all()
+        return render(request, 'admin.html', {'users': users})
+
+def delete_user(request, user_id):
+        try:
+                user = User.objects.get(id=user_id)
+                user.delete()
+                messages.success(request, 'Usuario eliminado con éxito.')
+                return redirect('/administrator/')
+        except User.DoesNotExist:
+                return HttpResponse('Usuario no encontrado')

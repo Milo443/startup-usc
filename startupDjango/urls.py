@@ -25,5 +25,8 @@ urlpatterns = [
     path('signup/',views.signup),
     path('login/', views.user_login),
     path('main/', views.main),
-    path('logout/', views.logout)
+    path('logout/', views.logout),
+    path('crear_proyecto/', views.crear_proyecto),
+    path('administrator/', views.administrator),
+    path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
 ]

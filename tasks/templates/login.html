@@ -1,6 +1,7 @@
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
+
 <body>
 
 <div class="container-fluid">
@@ -46,5 +47,15 @@
         </div>
     </form>
 </div>
-    
+
+{% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+{% endfor %}
 </body>
+
+
+
+
+
