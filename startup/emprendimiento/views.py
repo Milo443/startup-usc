@@ -105,7 +105,7 @@ def logout(request):
 
 def administrator(request):
         users = User.objects.all()
-        return render(request, 'admin.html', {'users': users})
+        return render(request, 'admin/admin.html', {'users': users})
 
 def delete_user(request, user_id):
         try:
@@ -115,3 +115,15 @@ def delete_user(request, user_id):
                 return redirect('/administrator/')
         except User.DoesNotExist:
                 return HttpResponse('Usuario no encontrado')
+        
+def edit_user(request):
+        if request.method == 'POST':
+                user_id = request.POST['user_id']
+                user = User.objects.get(id=user_id)
+                user.username = request.POST['username']
+                user.email = request.POST['email']
+                user.password = request.POST['password']
+                user.save()
+                return redirect('/administrator/')
+        return render(request, 'user/edit_user.html', {})
+        

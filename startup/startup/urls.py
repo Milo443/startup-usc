@@ -36,6 +36,7 @@ urlpatterns = [
     path('eliminar_proyecto/<int:proyecto_id>/', views.eliminar_proyecto, name='eliminar_proyecto'),
     path('editar_proyecto/<int:proyecto_id>/', views.editar_proyecto, name='editar_proyecto'),
     path('gestionar_proyecto/<int:proyecto_id>/', views.gestionar_proyecto, name='gestionar_proyecto'),
+    path('edit_user/', views.edit_user, name='edit_user'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 #if settings.DEBUG:
