@@ -5,7 +5,8 @@
 {% include 'components/navbar.html' %}
     <div class="container">
         <h1>Crea tu emprendimiento </h1>
-        <form>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="nombre">Nombre de la startup:</label>
                 <input type="text" class="form-control" id="nombre" name="nombre" required>
@@ -25,6 +26,11 @@
             <div class="form-group">
                 <label for="descripcion">Descripción:</label>
                 <textarea class="form-control" id="descripcion" name="descripcion" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="fecha_fundacion">Fecha de fundación:</label>
+                <input type="date" class="form-control" id="fecha_fundacion" name="fecha_fundacion" required>
             </div>
 
             <div class="form-group">
