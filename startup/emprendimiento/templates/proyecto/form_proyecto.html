@@ -1,7 +1,3 @@
-{% load django_bootstrap5 %}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
 {% include 'components/navbar.html' %}
     <div class="container">
         <h1>Crea tu emprendimiento </h1>
@@ -36,8 +32,26 @@
             <div class="form-group">
                 <label for="imagen">Imagen:</label>
                 <input type="file" class="form-control-file" id="imagen" name="imagen">
+                <img id="preview" src="#" alt="Preview" style="display: none; max-width: 200px; max-height: 200px;">
             </div>
 
             <input type="submit" class="btn btn-primary" value="Crear startup">
         </form>
     </div>
+    <script>
+        document.getElementById('imagen').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            var reader = new FileReader();
+        
+            reader.onloadend = function() {
+                document.getElementById('preview').src = reader.result;
+                document.getElementById('preview').style.display = 'block';
+            }
+        
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('preview').src = "";
+            }
+        });
+        </script>

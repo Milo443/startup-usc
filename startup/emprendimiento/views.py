@@ -95,32 +95,9 @@ def eliminar_proyecto(request, proyecto_id):
         return redirect('/main/')
 
 def gestionar_proyecto(request, proyecto_id):
-    user_login = request.user
-    if user_login.is_authenticated:
         proyecto = Proyecto.objects.get(id=proyecto_id)
-
-        # Prepare data to send to the API
-        data = {
-            'prompt': f"Nombre: {proyecto.nombre}\nDescripcion: {proyecto.descripcion}\nCategoria: {proyecto.categoria}\n ¿Qué más se puede hacer para mejorar este proyecto?",
-            'max_tokens': 20
-        }
-
-        # Send data to the API
-        headers = {
-            'Authorization': f"Bearer {os.getenv('OPENAI_API_KEY')}",
-            'Content-Type': 'application/json'
-        }
-        response = requests.post('https://api.openai.com/v1/engines/davinci-codex/completions', headers=headers, json=data)
-
-        # Process the response from the API
-        if response.status_code == 200:
-                result = response.json()
-                print(f"Status code: {response.status_code}, Message: {response.text}")
-                return HttpResponse('Error while sending data to the API')
-        else:
-            return HttpResponse('Error while sending data to the API')
-
-    return render(request, 'proyecto/gestionar_proyecto.html', {'proyecto': proyecto})
+        return render(request, 'proyecto/gestionar_proyecto.html', {'proyecto': proyecto})
+    
 
 def logout(request):
         auth_logout(request)
