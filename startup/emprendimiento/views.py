@@ -8,13 +8,15 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 import os
-from .models import Proyecto
+from .models import Proyecto, Financiero
 import requests
+from django.db.models import F,Sum 
 
 # Create your views here.
 def home(request):
         return render(request, 'home.html', {})
 
+#-------------login & register----------------
 def signup(request):
         if request.method == 'GET':
                 return render(request, 'signup.html', {'form': UserCreationForm})
@@ -49,6 +51,43 @@ def user_login(request):
                 else:
                         messages.error(request, 'Usuario o contraseña incorrecta')
                         return redirect('/login/')
+def logout(request):
+        auth_logout(request)
+        return redirect('/login/')
+
+#-------------ADMINISTRADOR----------------
+def administrator(request):
+        users = User.objects.all()
+        return render(request, 'admin/admin.html', {'users': users})
+
+def delete_user_admin(request, user_id):
+        try:
+                user = User.objects.get(id=user_id)
+                user.delete()
+                messages.success(request, 'Usuario eliminado con éxito.')
+                return redirect('/administrator/')
+        except User.DoesNotExist:
+                return HttpResponse('Usuario no encontrado')
+
+def edit_user_admin(request, user_id):
+        user = User.objects.get(id=user_id)
+        return render(request, 'admin/edit_user_admin.html', {'user': user})
+
+#-------------USUARIO---------------------------
+def edit_user(request):
+        user_login = request.user
+        if request.method == 'POST':
+                user_id = request.POST['user_id']
+                user = User.objects.get(id=user_id)
+                user.username = request.POST['username']
+                user.email = request.POST['email']
+                user.set_password(request.POST['password'])
+                user.save()
+                return redirect('/login/')
+        return render(request, 'user/edit_user.html', {})
+
+
+#-------------PROYECTO DASHBOARD----------------
 
 def main(request):
         user_login = request.user
@@ -58,6 +97,7 @@ def main(request):
                 return render(request, 'main.html', {'proyectos': proyectos})
 
         else:
+                
                 return HttpResponse('Usuario no autenticado')
 
 
@@ -94,36 +134,43 @@ def eliminar_proyecto(request, proyecto_id):
         proyecto.delete()
         return redirect('/main/')
 
+
+#-------------GESTION DE PROYECTO----------------
 def gestionar_proyecto(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         return render(request, 'proyecto/gestionar_proyecto.html', {'proyecto': proyecto})
     
+def financiero(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        financieros = Financiero.objects.filter(proyecto_id=proyecto_id)
+        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+        financiero_exists = Financiero.objects.filter(proyecto_id=proyecto_id).exists()
+        flujo_caja = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo - financiero.costos_produccion - financiero.gastos_administrativos
+        ingresos = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo
+        egresos = financiero.costos_produccion + financiero.gastos_administrativos
 
-def logout(request):
-        auth_logout(request)
-        return redirect('/login/')
+        return render(request, 'proyecto/modulos/financiero.html', {'proyecto': proyecto, 'financiero': financiero, 'financieros':financieros ,'financiero_exists': financiero_exists,'flujo_caja':flujo_caja, 'ingresos': ingresos, 'egresos': egresos})
 
-def administrator(request):
-        users = User.objects.all()
-        return render(request, 'admin/admin.html', {'users': users})
+def financieros(request):
+        financiero = Financiero.objects.all()
+        return render(request, 'proyecto/modulos/financiero.html', {'financiero': financiero})
 
-def delete_user(request, user_id):
-        try:
-                user = User.objects.get(id=user_id)
-                user.delete()
-                messages.success(request, 'Usuario eliminado con éxito.')
-                return redirect('/administrator/')
-        except User.DoesNotExist:
-                return HttpResponse('Usuario no encontrado')
-        
-def edit_user(request):
+def form_financiero(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
         if request.method == 'POST':
-                user_id = request.POST['user_id']
-                user = User.objects.get(id=user_id)
-                user.username = request.POST['username']
-                user.email = request.POST['email']
-                user.password = request.POST['password']
-                user.save()
-                return redirect('/administrator/')
-        return render(request, 'user/edit_user.html', {})
-        
+                #proyecto_id = request.POST['proyecto_id']
+                #proyecto = Proyecto.objects.get(id=proyecto_id)
+                ventas = request.POST['ventas']
+                costos_produccion = request.POST['costos_produccion']
+                gastos_administrativos = request.POST['gastos_administrativos']
+                capital_propio = request.POST['capital_propio']
+                prestamo = request.POST['prestamo']
+                inversores = request.POST['inversores']
+                financiero = Financiero(proyecto=proyecto, ventas=ventas, costos_produccion=costos_produccion, gastos_administrativos=gastos_administrativos, capital_propio=capital_propio, prestamo=prestamo, inversores=inversores)
+                financiero.save()
+                return redirect('/financiero/', {'proyecto': proyecto, 'financiero': financiero})
+        return render(request, 'proyecto/modulos/form_financiero.html', {'proyecto': proyecto})
+
+
+
+

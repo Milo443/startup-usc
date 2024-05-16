@@ -1,0 +1,93 @@
+{% include 'components/navbar.html' %}
+<div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Modulo Financiero</h1>
+            </div>
+            
+            {% if financiero_exists  %}
+                <div class="col-md-6 text-end">
+                    <a class="btn btn-primary" href="/form_financiero/{{ proyecto.id }}">Editar datos financieros <i class="fas fa-pen"></i> </a>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Ventas</th>
+                            <th>Costos de Producción</th>
+                            <th>Gastos Administrativos</th>
+                            <th>Capital Propio</th>
+                            <th>Préstamo</th>
+                            <th>Inversores</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in financieros %}
+                        <tr>
+                            <td>{{ data.ventas }}</td>
+                            <td>{{ data.costos_produccion }}</td>
+                            <td>{{ data.gastos_administrativos }}</td>
+                            <td>{{ data.capital_propio }}</td>
+                            <td>{{ data.prestamo }}</td>
+                            <td>{{ data.inversores }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="row">
+                    <div class="col-md-5">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                    <div class="col-md-5 d-flex align-items-center justify-content-center">
+                        <h2>flujo de caja total:</h2>
+                        {% load humanize %}
+                        <h3>$ {{ flujo_caja|intcomma }}</h3>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-md-6 text-end">
+                    <a class="btn btn-success" href="/form_financiero/{{ proyecto.id }}">Crear datos financieros <i class="fas fa-plus"></i> </a>
+                </div>
+            {% endif %}
+        </div>
+
+ 
+            
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Ingreso', 'Egreso'],
+            datasets: [{
+                data: [{{ ingresos }}, {{ egresos }}],
+                backgroundColor: [
+                    '#334CFF',
+                    '#8a89a6'
+                ],
+                borderColor: [
+                    '#334CFF',
+                    '#8a89a6'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Gráfico de Pastel'
+                }
+            }
+        }
+    });
+</script>
+</div>
+
+

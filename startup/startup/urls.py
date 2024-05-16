@@ -23,22 +23,42 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    
     path('', views.home),
+    #-----------login & register-----------------
     path('signup/', views.signup),
     path('signup/',views.signup),
     path('login/', views.user_login),
-    path('main/', views.main),
     path('logout/', views.logout),
-    path('crear_proyecto/', views.crear_proyecto),
+    #------------admin--------------------
+    path('admin/', admin.site.urls),
+    path('delete_user_admin/<int:user_id>/', views.delete_user_admin, name='delete_user'),
+    path('edit_user_admin/<int:user_id>/', views.edit_user_admin, name='edit_user_admin'),
     path('administrator/', views.administrator),
-    path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
+    #------------proyecto dashboard---------------
+    path('main/', views.main),
+    path('crear_proyecto/', views.crear_proyecto),
     path('eliminar_proyecto/<int:proyecto_id>/', views.eliminar_proyecto, name='eliminar_proyecto'),
     path('editar_proyecto/<int:proyecto_id>/', views.editar_proyecto, name='editar_proyecto'),
-    path('gestionar_proyecto/<int:proyecto_id>/', views.gestionar_proyecto, name='gestionar_proyecto'),
+
+    #--------------proyecto gestion----------------
+    path('gestionar_proyecto/<int:proyecto_id>/', views.gestionar_proyecto, name='gestionar_proyecto'), 
+        #--------------financiero----------------
+    path('financiero/', views.financieros, name='financiero'),
+    path('financiero/<int:proyecto_id>/', views.financiero, name='financiero'),
+    path('form_financiero/<int:proyecto_id>/', views.form_financiero, name='form_financiero'),
+        #--------------marketing----------------
+    #path('marketing/', views.marketing, name='marketing'),
+
+
+    #-------------usuario----------------
     path('edit_user/', views.edit_user, name='edit_user'),
 
+
+    
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 #if settings.DEBUG:
     #urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     #urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

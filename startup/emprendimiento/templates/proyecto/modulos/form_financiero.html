@@ -1,0 +1,37 @@
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="hidden" id="proyecto" name="proyecto" value="{{ proyecto.id }}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="ventas">Ventas:</label>
+            <input type="number" id="ventas" name="ventas" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="costos">Costos de producción:</label>
+            <input type="number" id="costos_produccion" name="costos_produccion" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="gastos">Gastos administrativos:</label>
+            <input type="number" id="gastos_administrativos" name="gastos_administrativos" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="capital">Capital propio:</label>
+            <input type="number" id="capital_propio" name="capital_propio" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="prestamo">Préstamos:</label>
+            <input type="number" id="prestamo" name="prestamo" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="inversores">Inversores:</label>
+            <input type="number" id="inversores" name="inversores" class="form-control" required>
+        </div>
+        <!-- Add more input fields for other sources of financing if needed -->
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
