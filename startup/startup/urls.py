@@ -49,8 +49,8 @@ urlpatterns = [
     path('form_financiero/<int:proyecto_id>/', views.form_financiero, name='form_financiero'),
     path('edit_financiero/<int:proyecto_id>/<int:financiero_id>/', views.edit_financiero, name='edit_financiero'),
         #--------------marketing----------------
-    path('marketing/', views.marketing, name='marketing'),
-
+    path('marketing/<int:proyecto_id>/', views.marketing, name='marketing'),
+    path('form_marketing/<int:proyecto_id>/', views.form_marketing, name='form_marketing'),
 
     #-------------usuario----------------
     path('edit_user/', views.edit_user, name='edit_user'),

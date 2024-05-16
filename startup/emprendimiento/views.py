@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.urls import reverse
 import os
-from .models import Proyecto, Financiero
+from .models import Proyecto, Financiero, Marketing
 import requests
 from django.db.models import F,Sum 
 
@@ -196,6 +196,22 @@ def edit_financiero(request, proyecto_id, financiero_id):
         return render(request, 'proyecto/modulos/edit_financiero.html', {'proyecto': proyecto, 'financiero': financiero})
 
         #-------------MARKETING----------------
-def marketing(request):
-        return render(request, 'proyecto/modulos/marketing.html', {})
+def marketing(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        return render(request, 'proyecto/modulos/marketing.html', {'proyecto': proyecto})
 
+def form_marketing(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        if request.method == 'POST':
+                proyecto_id = request.POST['proyecto_id']
+                proyecto = Proyecto.objects.get(id=proyecto_id)
+                mercado_objetivo = request.POST['mercado_objetivo']
+                segmentacion_cliente = request.POST['segmentacion_cliente']
+                canal_marketing = request.POST['canal_marketing']
+                estrategia_precio_promocion = request.POST['estrategia_precio_promocion']
+                marketing = Marketing(mercado_objetivo=mercado_objetivo, segmentacion_cliente=segmentacion_cliente, canal_marketing=canal_marketing, estrategia_precio_promocion=estrategia_precio_promocion, proyecto=proyecto)
+                marketing.save()
+                
+                
+                return redirect(reverse('marketing', args=[proyecto.id]))
+        return render(request, 'proyecto/modulos/form_marketing.html', {'proyecto': proyecto})

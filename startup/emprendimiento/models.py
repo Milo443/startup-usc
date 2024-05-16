@@ -26,3 +26,14 @@ class Financiero(models.Model):
     
     def __str__(self):
         return self.proyecto.nombre
+    
+class Marketing(models.Model):
+    mercado_objetivo= models.CharField(max_length=250, null=True, blank=True)
+    segmentacion_cliente = models.CharField(max_length=250, null=True, blank=True)
+    canal_marketing = models.CharField(max_length=250, null=True, blank=True)
+    estrategia_precio_promocion = models.CharField(max_length=250, null=True, blank=True)
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    def __str__(self):
+        return self.proyecto.nombre
