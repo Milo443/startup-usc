@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.urls import reverse
 import os
 from .models import Proyecto, Financiero
 import requests
@@ -139,16 +140,23 @@ def eliminar_proyecto(request, proyecto_id):
 def gestionar_proyecto(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         return render(request, 'proyecto/gestionar_proyecto.html', {'proyecto': proyecto})
-    
+
+   #-------------financiero--------------- 
 def financiero(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         financieros = Financiero.objects.filter(proyecto_id=proyecto_id)
-        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
         financiero_exists = Financiero.objects.filter(proyecto_id=proyecto_id).exists()
-        flujo_caja = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo - financiero.costos_produccion - financiero.gastos_administrativos
-        ingresos = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo
-        egresos = financiero.costos_produccion + financiero.gastos_administrativos
+        if financiero_exists:
+                financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+                flujo_caja = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo - financiero.costos_produccion - financiero.gastos_administrativos
+                ingresos = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo
+                egresos = financiero.costos_produccion + financiero.gastos_administrativos
 
+        else:
+                financiero = None
+                flujo_caja = None
+                ingresos = None
+                egresos = None
         return render(request, 'proyecto/modulos/financiero.html', {'proyecto': proyecto, 'financiero': financiero, 'financieros':financieros ,'financiero_exists': financiero_exists,'flujo_caja':flujo_caja, 'ingresos': ingresos, 'egresos': egresos})
 
 def financieros(request):
@@ -168,9 +176,26 @@ def form_financiero(request, proyecto_id):
                 inversores = request.POST['inversores']
                 financiero = Financiero(proyecto=proyecto, ventas=ventas, costos_produccion=costos_produccion, gastos_administrativos=gastos_administrativos, capital_propio=capital_propio, prestamo=prestamo, inversores=inversores)
                 financiero.save()
-                return redirect('/financiero/', {'proyecto': proyecto, 'financiero': financiero})
+                return redirect(reverse('financiero', args=[proyecto.id]))
         return render(request, 'proyecto/modulos/form_financiero.html', {'proyecto': proyecto})
 
+def edit_financiero(request, proyecto_id, financiero_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        financiero = Financiero.objects.get(id=financiero_id)
 
+        if request.method == 'POST':
+                financiero_id = request.POST['financiero_id']
+                financiero.ventas = request.POST['ventas']
+                financiero.costos_produccion = request.POST['costos_produccion']
+                financiero.gastos_administrativos = request.POST['gastos_administrativos']
+                financiero.capital_propio = request.POST['capital_propio']
+                financiero.prestamo = request.POST['prestamo']
+                financiero.inversores = request.POST['inversores']
+                financiero.save()
+                return redirect(reverse('financiero', args=[proyecto.id]))
+        return render(request, 'proyecto/modulos/edit_financiero.html', {'proyecto': proyecto, 'financiero': financiero})
 
+        #-------------MARKETING----------------
+def marketing(request):
+        return render(request, 'proyecto/modulos/marketing.html', {})
 

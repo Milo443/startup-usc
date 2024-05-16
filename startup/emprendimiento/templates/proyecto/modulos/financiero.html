@@ -1,38 +1,41 @@
 {% include 'components/navbar.html' %}
 <div class="container mt-4">
-        <div class="row">
+    <div class="row justify-content-center align-items-center">
             <div class="col-md-6">
                 <h1>Modulo Financiero</h1>
             </div>
             
             {% if financiero_exists  %}
                 <div class="col-md-6 text-end">
-                    <a class="btn btn-primary" href="/form_financiero/{{ proyecto.id }}">Editar datos financieros <i class="fas fa-pen"></i> </a>
+                    <a class="btn btn-primary" href="/edit_financiero/{{ proyecto.id }}/{{financiero.id}}">Editar datos financieros <i class="fas fa-pen"></i> </a>
                 </div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Ventas</th>
-                            <th>Costos de Producción</th>
-                            <th>Gastos Administrativos</th>
-                            <th>Capital Propio</th>
-                            <th>Préstamo</th>
-                            <th>Inversores</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for data in financieros %}
-                        <tr>
-                            <td>{{ data.ventas }}</td>
-                            <td>{{ data.costos_produccion }}</td>
-                            <td>{{ data.gastos_administrativos }}</td>
-                            <td>{{ data.capital_propio }}</td>
-                            <td>{{ data.prestamo }}</td>
-                            <td>{{ data.inversores }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-responsive mt-4" style="borderColor:black:">
+                    <table class="table table-striped">
+                        <thead  class="thead-dark">
+                            <tr>
+                                <th scope="col">Ventas</th>
+                                <th scope="col">Costos de Producción</th>
+                                <th scope="col">Gastos Administrativos</th>
+                                <th scope="col">Capital Propio</th>
+                                <th scope="col">Préstamo</th>
+                                <th scope="col">Inversores</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in financieros %}
+                            <tr>
+                                <td>{{ data.ventas }}</td>
+                                <td>{{ data.costos_produccion }}</td>
+                                <td>{{ data.gastos_administrativos }}</td>
+                                <td>{{ data.capital_propio }}</td>
+                                <td>{{ data.prestamo }}</td>
+                                <td>{{ data.inversores }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
                 <div class="row">
                     <div class="col-md-5">
                         <canvas id="myChart"></canvas>
