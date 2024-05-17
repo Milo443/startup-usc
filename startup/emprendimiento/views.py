@@ -203,15 +203,11 @@ def marketing(request, proyecto_id):
 def form_marketing(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         if request.method == 'POST':
-                proyecto_id = request.POST['proyecto_id']
-                proyecto = Proyecto.objects.get(id=proyecto_id)
                 mercado_objetivo = request.POST['mercado_objetivo']
                 segmentacion_cliente = request.POST['segmentacion_cliente']
                 canal_marketing = request.POST['canal_marketing']
                 estrategia_precio_promocion = request.POST['estrategia_precio_promocion']
                 marketing = Marketing(mercado_objetivo=mercado_objetivo, segmentacion_cliente=segmentacion_cliente, canal_marketing=canal_marketing, estrategia_precio_promocion=estrategia_precio_promocion, proyecto=proyecto)
                 marketing.save()
-                
-                
                 return redirect(reverse('marketing', args=[proyecto.id]))
         return render(request, 'proyecto/modulos/form_marketing.html', {'proyecto': proyecto})
