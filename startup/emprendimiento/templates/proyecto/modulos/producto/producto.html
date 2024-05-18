@@ -1,0 +1,51 @@
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center align-items-center">
+        {% comment %} <div class="col-md-1 ml-1">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+        </div> {% endcomment %}
+        <div class="col-md-6">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+            <h1>Modulo Productos/Servicios</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-success" href="/form_producto/{{ proyecto.id }}">Crear Productos/Servicios <i class="fas fa-plus"></i> </a>
+        </div>
+        {% if producto_exists %}
+        
+        <div class="row">
+            {% for data in productos %}
+            <div class="col-md-4 mb-4">
+                <div class="card" style="width: 13rem;">
+                    {% if data.imagen %}
+                        <img src="{{data.imagen.url}}" class="card-img-top" alt="Producto Image">
+                    {% else %}
+                        <img class="card-img-top" src="..." alt="Card image cap">
+                    {% endif %}
+                    <div class="card-body">
+                      <h3 class="card-title">{{ data.nombre_producto }}</h3>
+                      <p class="card-text">{{data.descripcion_producto}}</p>
+                      <h7 class="card-subtitle mb-2 text-muted">{{ data.ciclo_vida}}</h7>
+                      
+                    </div>
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item">Desarrollo: ${{ data.costo_desarrollo }}</li>
+                      <li class="list-group-item">Venta: ${{ data.precio_venta }}</li>
+                    </ul>
+                    <div class="card-body">
+                        <a href="/edit_producto/{{proyecto.id}}/{{ data.id }}" class="btn btn-primary"> <i class="fas fa-pencil-alt"></i> </a>
+                        <a href="/delete_producto/{{proyecto.id}}/{{ data.id }}" class="btn btn-danger"> <i class="fas fa-trash"></i> </a>
+                    </div>
+                  </div>
+            </div>
+
+
+            
+        {% endfor %}
+        </div>
+        {% else %}
+        
+        {% endif %}
+    </div>
+</div>

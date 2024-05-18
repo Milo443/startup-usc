@@ -1,0 +1,58 @@
+{% include 'components/navbar.html' %}
+
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+</style>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Modulo Marketing</h1>
+        </div>
+    </div>
+</div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="hidden" id="proyecto" name="proyecto" value="{{ proyecto.id }}" class="form-control" required>
+                    <input type="hidden" id="marketing_id" name="marketing_id" value="{{ marketing.id }}" class="form-control" required>
+                </div>
+
+
+                <div class="form-group">
+                    <h5>Mercado objetivo</h5>
+                    <p>Breve descripcion del mercado objetivo de su producto</p>
+                    <textarea class="form-control" id="mercado_objetivo" name="mercado_objetivo">{{marketing.mercado_objetivo}}</textarea>
+                </div>
+                <div class="form-group">
+                    <h5>Segmentacion clientes</h5>
+                    <p>Breve descripcion del cliente</p>
+                    <textarea class="form-control" id="segmentacion_cliente" name="segmentacion_cliente">{{marketing.segmentacion_cliente}}</textarea>
+                </div>
+                <div class="form-group">
+                    <h5>Canales de marketing</h5>
+                    <p>Define el tipo de canal de marketing que desea basar la estrategia.</p>
+                    <input type="text" class="form-control" id="canal_marketing" name="canal_marketing" placeholder="Ejemplo: publicidad, redes sociales, email..." value="{{marketing.canal_marketing}}">
+                </div>
+                <div class="form-group">
+                    <h5>Estrategia de precio y promociones</h5>
+                    <p>Define que estrategias y promociones se tendran en cuenta para la estrategia de marketing.</p>
+                    <input type="text" class="form-control" id="estrategia_precio_promocion" name="estrategia_precio_promocion" placeholder="Ejemplo: precio introductorio, cupones, descuentos..." value="{{marketing.estrategia_precio_promocion}}">
+                </div>
+
+                <div class="form-group">
+                    <h5>Gastos de marketing</h5>
+                    <p>Ingresa un supuesto de gastos de marketing para esta estrategia, los gastos son para un periodo anual.</p>
+                    <input type="text" class="form-control" id="gastos_marketing" name="gastos_marketing" placeholder="10000" value="{{marketing.gastos_marketing}}">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-save"></i> Guardar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

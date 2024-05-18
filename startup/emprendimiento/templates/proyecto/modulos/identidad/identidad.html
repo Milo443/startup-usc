@@ -1,0 +1,56 @@
+{% include 'components/navbar.html' %}
+
+<div class='container mt-4'>
+    <div class='row row justify-content-center align-items-center'>
+        <div class='col-md-6'>  
+            <a class='btn btn-primary' href='/gestionar_proyecto/{{ proyecto.id }}'><i class='fas fa-arrow-left'></i></a>
+            <h1>Modulo Identidad</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            {% if identidad_exists %}
+                <a class="btn btn-primary" href="/edit_identidad/{{ proyecto.id }}">Editar Identidad <i class='fas fa-pen'></i></a>
+            {%else%}
+                <a class="btn btn-success" href="/form_identidad/{{ proyecto.id }}">Crear Identidad <i class="fas fa-plus"></i></a>
+            {%endif%}
+            
+        </div>
+        {% if identidad_exists%}
+        
+        <div class="container mt-4 mb-4 text-center">
+            <h2>{{proyecto.nombre}}</h2>
+        </div>
+        <div class="card-group">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Mision</h3>
+                    <p>{{ identidad.mision }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h3>Vision</h3>
+                    <p>{{ identidad.vision }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-group">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Valores</h3>
+                    <p>{{ identidad.valores }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="card-group">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Objetivos</h3>
+                    <p>{{ identidad.objetivos }}</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+            <p>Por favor crea la identidad de tu proyecto</p>
+        {% endif %}
+    </div>
+</div>

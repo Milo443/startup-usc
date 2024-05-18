@@ -1,0 +1,51 @@
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center align-items-center">
+        {% comment %} <div class="col-md-1 ml-1">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+        </div> {% endcomment %}
+        <div class="col-md-6">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+            <h1>Modulo Marketing</h1>
+        </div>
+
+        {% if marketing_exist %}
+        <div class="col-md-6 text-end">
+            <a class="btn btn-success" href="/form_marketing/{{ proyecto.id }}">Crear estrategia de marketing <i class="fas fa-plus"></i> </a>
+        </div>
+        <div class="table-responsive mt-4" style="borderColor:black:">
+            <table class="table table-striped">
+                <thead  class="thead-dark">
+                    <tr>
+                        <th>Mercado objetivo</th>
+                        <th>Segmentacion clientes</th>
+                        <th>Canales de marketing</th>
+                        <th>Estrategia de precio y promociones</th>
+                        <th>Gastos de marketing</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in marketings %}
+                    <tr>
+                        <td>{{ data.mercado_objetivo }}</td>
+                        <td>{{ data.segmentacion_cliente }}</td>
+                        <td>{{ data.canal_marketing }}</td>
+                        <td>{{ data.estrategia_precio_promocion }}</td>
+                        <td>{{ data.gastos_marketing }}</td>
+                        <td>
+                            <a class="btn btn-primary" href="/edit_marketing/{{ proyecto.id }}/{{ data.id }}"><i class="fas fa-pen"></i></a>
+                            <a class="btn btn-danger" href="/delete_marketing/{{ proyecto.id }}/{{ data.id }}"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+        <div class="col-md-6 text-end">
+            <a class="btn btn-success" href="/form_marketing/{{ proyecto.id }}/{{financiero.id}}">Crear estrategia de marketing <i class="fas fa-plus"></i> </a>
+        </div>
+        {% endif %}
+    </div>
+</div>

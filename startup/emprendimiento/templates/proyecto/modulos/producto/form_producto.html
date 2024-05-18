@@ -1,0 +1,112 @@
+{% include 'components/navbar.html' %}
+
+<style>
+    .form-group {
+        margin-bottom: 40px;
+    }
+
+    .form-group spam {
+        color: blue;
+        cursor: pointer;
+    }
+</style>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+            <h1>Modulo Productos/Servicios</h1>
+        </div>
+    </div>
+</div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post" enctype="multipart/form-data"> 
+                {% csrf_token %}
+                <div class="form-group" enctype="multipart/form-data">
+                    <h5>Nombre del producto/servicio</h5>
+                    {% comment %} <p>Breve descripcion del mercado objetivo de su producto</p> {% endcomment %}
+                    <input type="text" class="form-control" id="nombre_producto" name="nombre_producto" placeholder="">
+                </div>
+
+                <div class="form-group">
+                    <h5>Descripción de producto/servicio:</h5>
+                    <p>Describa detalladamente el producto o servicio que ofrecerá el emprendimiento.</p>
+                    {% comment %} <label for="descripcion">Descripción de producto/servicio:</label> {% endcomment %}
+                    <textarea class="form-control" id="descripcion" name="descripcion_producto" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <h5>Categoría:</h5>
+                    <p>Selecciona de manera general si el producto o servicio es <spam title="Son aquellos bienes físicos, que tienen una forma material y pueden ser percibidos por los sentidos.">tangible</spam> o <spam title="Son aquellos bienes que carecen de forma física y no pueden ser percibidos por los sentidos directamente.">intangible</spam>.</p>
+                    {% comment %} <label for="categoria">Categoría:</label> {% endcomment %}
+                    <select class="form-control" id="categoria_producto" name="categoria_producto" title="Selecciona la categoría del producto o servicio" help="Esta opción te permite seleccionar si el producto o servicio es tangible o intangible">
+                        <option value="Tangible">Tangible</option>
+                        <option value="Intangible">Intangible</option>
+                    </select>
+                </div>
+
+                {% comment %} <div class="form-group">
+                    <label for="sector">Sector:</label>
+                    <select class="form-control" id="sector" name="sector">
+                        <option value="sector1">Sector 1</option>
+                        <option value="sector2">Sector 2</option>
+                        <option value="sector3">Sector 3</option>
+                    </select>
+                </div> {% endcomment %}
+
+                <div class="form-group">
+                    <h5>Definicion del ciclo de vida:</h5>
+                    <p>Defina las etapas por las que pasa el producto o servicio desde su concepción hasta su retirada del mercado si es el caso.</p>
+                    <textarea class="form-control" id="ciclo_vida" name="ciclo_vida" rows="4" placeholder="puedes definir las siguientes etapas: Desarrollo, Introducción, Crecimiento, Madurez, Declive y retirada"></textarea>
+                </div>
+
+                {% comment %} <div class="form-group">
+                    <label for="tareas">Tareas asociadas:</label>
+
+                    <textarea class="form-control" id="tareas" name="tareas" rows="4"></textarea>
+                </div> {% endcomment %}
+
+                <div class="form-group">
+                    <h5>Costo de desarrollo:</h5>
+                    <input type="number" class="form-control" id="costo_desarrollo" name="costo_desarrollo">
+                </div>
+
+                <div class="form-group">
+                    <h5>Costo de producción:</h5>
+                    <input type="number" class="form-control" id="costo_produccion" name="costo_produccion">
+                </div>
+
+                <div class="form-group">
+                    <h5>Precio de venta:</h5>
+                    <input type="number" class="form-control" id="precio_venta" name="precio_venta">
+                </div>
+
+                <div class="form-group mt-2">
+                    <h5>Imagen del producto:</h5>
+                    <img id="preview" src="#" alt="Preview" style="display: none; max-width: 200px; max-height: 200px;">
+                    <input type="file" class="form-control-file" id="imagen" name="imagen">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Crear</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('imagen').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+    
+        reader.onloadend = function() {
+            document.getElementById('preview').src = reader.result;
+            document.getElementById('preview').style.display = 'block';
+        }
+    
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('preview').src = "";
+        }
+    });
+    </script>

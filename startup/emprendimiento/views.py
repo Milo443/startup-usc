@@ -9,9 +9,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.urls import reverse
 import os
-from .models import Proyecto, Financiero, Marketing
+from .models import Proyecto, Financiero, Marketing, Producto, Identidad
 import requests
 from django.db.models import F,Sum 
+from openai import OpenAI
+import openai
 
 # Create your views here.
 def home(request):
@@ -157,11 +159,11 @@ def financiero(request, proyecto_id):
                 flujo_caja = None
                 ingresos = None
                 egresos = None
-        return render(request, 'proyecto/modulos/financiero.html', {'proyecto': proyecto, 'financiero': financiero, 'financieros':financieros ,'financiero_exists': financiero_exists,'flujo_caja':flujo_caja, 'ingresos': ingresos, 'egresos': egresos})
+        return render(request, 'proyecto/modulos/financiero/financiero.html', {'proyecto': proyecto, 'financiero': financiero, 'financieros':financieros ,'financiero_exists': financiero_exists,'flujo_caja':flujo_caja, 'ingresos': ingresos, 'egresos': egresos})
 
 def financieros(request):
         financiero = Financiero.objects.all()
-        return render(request, 'proyecto/modulos/financiero.html', {'financiero': financiero})
+        return render(request, 'proyecto/modulos/financiero/financiero.html', {'financiero': financiero})
 
 def form_financiero(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -177,7 +179,7 @@ def form_financiero(request, proyecto_id):
                 financiero = Financiero(proyecto=proyecto, ventas=ventas, costos_produccion=costos_produccion, gastos_administrativos=gastos_administrativos, capital_propio=capital_propio, prestamo=prestamo, inversores=inversores)
                 financiero.save()
                 return redirect(reverse('financiero', args=[proyecto.id]))
-        return render(request, 'proyecto/modulos/form_financiero.html', {'proyecto': proyecto})
+        return render(request, 'proyecto/modulos/financiero/form_financiero.html', {'proyecto': proyecto})
 
 def edit_financiero(request, proyecto_id, financiero_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -193,12 +195,14 @@ def edit_financiero(request, proyecto_id, financiero_id):
                 financiero.inversores = request.POST['inversores']
                 financiero.save()
                 return redirect(reverse('financiero', args=[proyecto.id]))
-        return render(request, 'proyecto/modulos/edit_financiero.html', {'proyecto': proyecto, 'financiero': financiero})
+        return render(request, 'proyecto/modulos/financiero/edit_financiero.html', {'proyecto': proyecto, 'financiero': financiero})
 
         #-------------MARKETING----------------
 def marketing(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
-        return render(request, 'proyecto/modulos/marketing.html', {'proyecto': proyecto})
+        marketings = Marketing.objects.filter(proyecto_id=proyecto_id)
+        marketing_exists = Marketing.objects.filter(proyecto_id=proyecto_id).exists()
+        return render(request, 'proyecto/modulos/marketing/marketing.html', {'proyecto': proyecto, 'marketings': marketings, 'marketing_exist': marketing_exists})
 
 def form_marketing(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -207,7 +211,147 @@ def form_marketing(request, proyecto_id):
                 segmentacion_cliente = request.POST['segmentacion_cliente']
                 canal_marketing = request.POST['canal_marketing']
                 estrategia_precio_promocion = request.POST['estrategia_precio_promocion']
-                marketing = Marketing(mercado_objetivo=mercado_objetivo, segmentacion_cliente=segmentacion_cliente, canal_marketing=canal_marketing, estrategia_precio_promocion=estrategia_precio_promocion, proyecto=proyecto)
+                gastos_marketing = request.POST['gastos_marketing']
+                marketing = Marketing(mercado_objetivo=mercado_objetivo, segmentacion_cliente=segmentacion_cliente, canal_marketing=canal_marketing, estrategia_precio_promocion=estrategia_precio_promocion, gastos_marketing=gastos_marketing, proyecto=proyecto)
                 marketing.save()
                 return redirect(reverse('marketing', args=[proyecto.id]))
-        return render(request, 'proyecto/modulos/form_marketing.html', {'proyecto': proyecto})
+        return render(request, 'proyecto/modulos/marketing/form_marketing.html', {'proyecto': proyecto})
+
+def edit_marketing(request, proyecto_id, marketing_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        marketing = Marketing.objects.get(id=marketing_id)
+        if request.method == 'POST':
+                marketing_id = request.POST['marketing_id']
+                marketing.mercado_objetivo = request.POST['mercado_objetivo']
+                marketing.segmentacion_cliente = request.POST['segmentacion_cliente']
+                marketing.canal_marketing = request.POST['canal_marketing']
+                marketing.estrategia_precio_promocion = request.POST['estrategia_precio_promocion']
+                marketing.gastos_marketing = request.POST['gastos_marketing']
+                marketing.save()
+                return redirect(reverse('marketing', args=[proyecto.id]))
+        return render(request, 'proyecto/modulos/marketing/edit_marketing.html', {'proyecto': proyecto, 'marketing': marketing})
+
+def delete_marketing(request, proyecto_id, marketing_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        marketing = Marketing.objects.get(id=marketing_id)
+        marketing.delete()
+        return redirect(reverse('marketing', args=[proyecto.id]))
+
+#-------------PRODUCTO----------------#
+def producto(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        producto_exists = Producto.objects.filter(proyecto_id=proyecto_id).exists()
+        if producto_exists:
+                productos = Producto.objects.get(proyecto_id=proyecto_id)
+                productos = Producto.objects.filter(proyecto_id=proyecto_id)
+        else:
+                productos = None
+
+        return render(request, 'proyecto/modulos/producto/producto.html', {'proyecto': proyecto, 'productos': productos, 'producto_exists': producto_exists})
+
+def form_producto(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        if request.method == 'POST':
+                nombre_producto = request.POST['nombre_producto']
+                descripcion_producto = request.POST['descripcion_producto']
+                categoria_producto = request.POST['categoria_producto']
+                ciclo_vida = request.POST['ciclo_vida']
+                costo_desarrollo = request.POST['costo_desarrollo']
+                costo_produccion = request.POST['costo_produccion']
+                precio_venta = request.POST['precio_venta']
+                imagen = request.FILES.get('imagen')
+                if imagen:
+                        producto = Producto(nombre_producto=nombre_producto, descripcion_producto=descripcion_producto, categoria_producto=categoria_producto, ciclo_vida=ciclo_vida, costo_desarrollo=costo_desarrollo, costo_produccion=costo_produccion, precio_venta=precio_venta, imagen=imagen, proyecto=proyecto)
+                else:
+                        producto = Producto(nombre_producto=nombre_producto, descripcion_producto=descripcion_producto, categoria_producto=categoria_producto, ciclo_vida=ciclo_vida, costo_desarrollo=costo_desarrollo, costo_produccion=costo_produccion, precio_venta=precio_venta, proyecto=proyecto)
+                producto.save()
+                return redirect(reverse('producto', args=[proyecto.id]))
+        return render(request, 'proyecto/modulos/producto/form_producto.html', {'proyecto': proyecto})
+
+def edit_producto(request, proyecto_id, producto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        producto = Producto.objects.get(id=producto_id)
+        if request.method == 'POST':
+                producto_id = request.POST['producto_id']
+                producto.nombre_producto = request.POST['nombre_producto']
+                producto.descripcion_producto = request.POST['descripcion_producto']
+                producto.categoria_producto = request.POST['categoria_producto']
+                producto.ciclo_vida = request.POST['ciclo_vida']
+                producto.costo_desarrollo = request.POST['costo_desarrollo']
+                producto.costo_produccion = request.POST['costo_produccion']
+                producto.precio_venta = request.POST['precio_venta']
+                producto.imagen = request.FILES.get('imagen')
+                producto.save()
+                return redirect(reverse('producto', args=[proyecto.id]))
+        return render(request, 'proyecto/modulos/producto/edit_producto.html', {'proyecto': proyecto, 'producto': producto})
+
+def delete_producto(request, proyecto_id, producto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        producto = Producto.objects.get(id=producto_id)
+        producto.delete()
+        return redirect(reverse('producto', args=[proyecto.id]))
+
+#--------------RECURSOS HUMANOS----------------#
+def recursos_humanos(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        
+        return render(request, 'proyecto/modulos/recursos_humanos/recursos_humanos.html', {'proyecto': proyecto})
+
+def form_recursos_humanos(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        return render(request, 'proyecto/modulos/recursos_humanos/form_recursos_humanos.html', {'proyecto': proyecto})
+
+#-------------IDENTIDAD DEL EMPRENDIMIENTO----------------
+def identidad(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        identidad_exists = Identidad.objects.filter(proyecto_id=proyecto_id).exists()
+        if identidad_exists:
+                identidad = Identidad.objects.get(proyecto_id=proyecto_id)
+        return render(request, 'proyecto/modulos/identidad/identidad.html', {'proyecto': proyecto, 'identidad_exists': identidad_exists, 'identidad': identidad})
+
+def form_identidad(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        if request.method == 'POST':
+                mision = request.POST['mision']
+                vision = request.POST['vision']
+                valores = request.POST['valores']
+                objetivos = request.POST['objetivos']
+                identidad = Identidad(mision=mision, vision=vision, valores=valores, objetivos=objetivos, proyecto=proyecto)
+                identidad.save()
+                return redirect(reverse('identidad', args=[proyecto.id]))
+        return render(request, 'proyecto/modulos/identidad/form_identidad.html', {'proyecto': proyecto})
+
+
+#-------------ANALISIS----------------#
+def analisis(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+        marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
+        producto_list = Producto.objects.filter(proyecto_id=proyecto_id)
+
+
+        client = OpenAI(api_key="sk-proj-oHwgvOYovBO6XxkpPMGuT3BlbkFJBZ17uo0XxrjkGcYFYP0m")
+
+ 
+        messages = [
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis detallado y la viabilidad del mismo pero solo del modulo de marketing"},
+                {"role": "user", "content": f"\nnombre del emprendimiento:{proyecto.nombre},categoria:{proyecto.categoria}, descripcion:{proyecto.descripcion}"},
+                {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
+        ]
+
+        for marketing in marketing_list:
+                messages.append({"role": "user", "content": f"\nmarketing: mercado objetivo:{marketing.mercado_objetivo}, segmentacion de cliente:{marketing.segmentacion_cliente}, canal de marketing:{marketing.canal_marketing}, estrategia de precio y promocion:{marketing.estrategia_precio_promocion}, gastos de marketing:{marketing.gastos_marketing}"})
+
+        for producto in producto_list:
+                messages.append({"role": "user", "content": f"\nproducto: nombre del producto:{producto.nombre_producto}, descripcion del producto:{producto.descripcion_producto}, categoria del producto:{producto.categoria_producto}, ciclo de vida del producto:{producto.ciclo_vida}, costo de desarrollo:{producto.costo_desarrollo}, costo de produccion:{producto.costo_produccion}, precio de venta:{producto.precio_venta}"})
+
+        completion = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=messages
+        )
+
+        message_content = completion.choices[0].message.content
+        print(message_content)
+
+        return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing': marketing, 'producto': producto, 'chat_completion': completion, 'message_content': message_content})
+        #return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing': marketing, 'producto': producto})

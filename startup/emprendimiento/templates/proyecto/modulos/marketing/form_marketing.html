@@ -8,6 +8,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-6">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
             <h1>Modulo Marketing</h1>
         </div>
     </div>
@@ -29,17 +30,22 @@
                 </div>
                 <div class="form-group">
                     <h5>Canales de marketing</h5>
-                    <p>Define el tipo de canal de marketing que desea basar la estrategia</p>
+                    <p>Define el tipo de canal de marketing que desea basar la estrategia.</p>
                     <input type="text" class="form-control" id="canal_marketing" name="canal_marketing" placeholder="Ejemplo: publicidad, redes sociales, email...">
                 </div>
                 <div class="form-group">
                     <h5>Estrategia de precio y promociones</h5>
-                    <p>Define que estrategias y promociones se tendran en cuenta para la estrategia de marketing</p>
+                    <p>Define que estrategias y promociones se tendran en cuenta para la estrategia de marketing.</p>
                     <input type="text" class="form-control" id="estrategia_precio_promocion" name="estrategia_precio_promocion" placeholder="Ejemplo: precio introductorio, cupones, descuentos...">
+                </div>
+
+                <div class="form-group">
+                    <h5>Gastos de marketing</h5>
+                    <p>Ingresa un supuesto de gastos de marketing para esta estrategia, los gastos son para un periodo anual.</p>
+                    <input type="text" class="form-control" id="gastos_marketing" name="gastos_marketing" placeholder="10000">
                 </div>
                 <button type="submit" class="btn btn-primary">Crear</button>
             </form>
         </div>
     </div>
 </div>
-

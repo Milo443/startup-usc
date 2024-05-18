@@ -51,6 +51,20 @@ urlpatterns = [
         #--------------marketing----------------
     path('marketing/<int:proyecto_id>/', views.marketing, name='marketing'),
     path('form_marketing/<int:proyecto_id>/', views.form_marketing, name='form_marketing'),
+    path('edit_marketing/<int:proyecto_id>/<int:marketing_id>/', views.edit_marketing, name='edit_marketing'),
+    path('delete_marketing/<int:proyecto_id>/<int:marketing_id>/', views.delete_marketing, name='delete_marketing'),
+    #--------------producto----------------
+    path('producto/<int:proyecto_id>/', views.producto, name='producto'),
+    path('form_producto/<int:proyecto_id>/', views.form_producto, name='form_producto'),
+    path('edit_producto/<int:proyecto_id>/<int:producto_id>/', views.edit_producto, name='edit_producto'),
+    path('delete_producto/<int:proyecto_id>/<int:producto_id>/', views.delete_producto, name='delete_producto'),
+    #--------------identidad----------------
+    path('identidad/<int:proyecto_id>/', views.identidad, name='identidad'),
+    path('form_identidad/<int:proyecto_id>/', views.form_identidad, name='form_identidad'),
+
+
+    #--------------analisis-----------------
+    path('analisis/<int:proyecto_id>/', views.analisis, name='analisis'),
 
     #-------------usuario----------------
     path('edit_user/', views.edit_user, name='edit_user'),
