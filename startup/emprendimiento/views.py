@@ -143,7 +143,7 @@ def gestionar_proyecto(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         return render(request, 'proyecto/gestionar_proyecto.html', {'proyecto': proyecto})
 
-   #-------------financiero--------------- 
+#-------------FINANCIERO---------------------- 
 def financiero(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         financieros = Financiero.objects.filter(proyecto_id=proyecto_id)
@@ -167,6 +167,8 @@ def financieros(request):
 
 def form_financiero(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
+        cargo_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+        total_salarios = CargoEmpleado.objects.aggregate(total_salarios=Sum(F('salario') * F('numero_empleados')))['total_salarios']
         if request.method == 'POST':
                 #proyecto_id = request.POST['proyecto_id']
                 #proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -179,7 +181,7 @@ def form_financiero(request, proyecto_id):
                 financiero = Financiero(proyecto=proyecto, ventas=ventas, costos_produccion=costos_produccion, gastos_administrativos=gastos_administrativos, capital_propio=capital_propio, prestamo=prestamo, inversores=inversores)
                 financiero.save()
                 return redirect(reverse('financiero', args=[proyecto.id]))
-        return render(request, 'proyecto/modulos/financiero/form_financiero.html', {'proyecto': proyecto})
+        return render(request, 'proyecto/modulos/financiero/form_financiero.html', {'proyecto': proyecto, 'cargo_empleados': cargo_empleados, 'total_salarios': total_salarios})
 
 def edit_financiero(request, proyecto_id, financiero_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)

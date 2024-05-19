@@ -8,7 +8,7 @@
         </div>
         <div class="col-md-6 text-end">
             {% if identidad_exists %}
-                <a class="btn btn-primary" href="/edit_identidad/{{ proyecto.id }}/{{identidad.idw}}">Editar Identidad <i class='fas fa-pen'></i></a>
+                <a class="btn btn-primary" href="/edit_identidad/{{ proyecto.id }}/{{identidad.id}}">Editar Identidad <i class='fas fa-pen'></i></a>
             {%else%}
                 <a class="btn btn-success" href="/form_identidad/{{ proyecto.id }}">Crear Identidad <i class="fas fa-plus"></i></a>
             {%endif%}

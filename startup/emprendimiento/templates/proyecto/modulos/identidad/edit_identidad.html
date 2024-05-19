@@ -29,25 +29,25 @@
         <h5>Mision:</h5>
         <p>Defina la razón de ser del emprendimiento, describe el propósito fundamental y la actividad principal a la que se dedica. Responde a la pregunta ¿Qué hacemos?</p>
         {% comment %} <label for="mision">Misión:</label> {% endcomment %}
-        <textarea class="form-control" id="mision" name="mision" rows="3">{{identidad.mision}}</textarea>
+        <textarea class="form-control" id="mision" name="mision" rows="3" required>{{identidad.mision}}</textarea>
     </div>
     <div class="form-group">
         <h5>Vision:</h5>
         <p>proyección futura que se desea alcanzar, es la situación ideal que se espera lograr en un plazo determinado. Responde a la pregunta ¿Qué queremos ser?</p>
         {% comment %} <label for="vision" show="hiden">Visión:</label> {% endcomment %}
-        <textarea class="form-control" id="vision" name="vision" rows="3">{{identidad.vision}}</textarea>
+        <textarea class="form-control" id="vision" name="vision" rows="3" required>{{identidad.vision}}</textarea>
     </div>
     <div class="form-group">
         <h5>Valores:</h5>
         <p>Principios éticos y morales que rigen el comportamiento y las decisiones del emprendimiento. Establecen la filosofía y la cultura organizacional.</p>
         {% comment %} <label for="valores">Valores:</label> {% endcomment %}
-        <textarea class="form-control" id="valores" name="valores" rows="3">{{identidad.valores}}</textarea>
+        <textarea class="form-control" id="valores" name="valores" rows="3" required>{{identidad.valores}}</textarea>
     </div>
     <div class="form-group">
         <h5>Objetivos:</h5>
         <p>Resultados específicos que se desean alcanzar en un período de tiempo determinado. Deben ser medibles, alcanzables, relevantes y enmarcados en un tiempo específico.</p>
         {% comment %} <label for="objetivos">Objetivos:</label> {% endcomment %}
-        <textarea class="form-control" id="objetivos" name="objetivos" rows="3">{{identidad.valores}}</textarea>
+        <textarea class="form-control" id="objetivos" name="objetivos" rows="3" required>{{identidad.valores}}</textarea>
     </div>
     <button type="submit" class="btn btn-primary">Guardar</button>
 </form>
