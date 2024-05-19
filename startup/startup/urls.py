@@ -61,6 +61,11 @@ urlpatterns = [
     #--------------identidad----------------
     path('identidad/<int:proyecto_id>/', views.identidad, name='identidad'),
     path('form_identidad/<int:proyecto_id>/', views.form_identidad, name='form_identidad'),
+    path('edit_identidad/<int:proyecto_id>/<int:identidad_id>/', views.edit_identidad, name='edit_identidad'),
+    #--------------recursos humanos----------------
+    path('recursos_humanos/<int:proyecto_id>/', views.recursos_humanos, name='recursos_humanos'),
+    path('form_recursos_humanos/<int:proyecto_id>/', views.form_recursos_humanos, name='form_recursos_humanos'),
+    path('edit_recursos_humanos/<int:proyecto_id>/<int:cargos_empleados_id>/', views.edit_recursos_humanos, name='edit_recursos_humanos'),
 
 
     #--------------analisis-----------------

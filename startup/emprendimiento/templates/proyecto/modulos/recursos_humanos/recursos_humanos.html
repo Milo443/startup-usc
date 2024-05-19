@@ -1,0 +1,50 @@
+{% include 'components/navbar.html' %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-6">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+            <h1>Modulo Recursos Humanos</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-success" href="/form_recursos_humanos/{{ proyecto.id }}">Crear Productos/Servicios <i class="fas fa-plus"></i> </a>
+        </div>
+    </div>
+    <div class="row">
+        {%if cargo_exists%}
+        <div class="table-responsive mt-4" style="borderColor:black:">
+            <table class="table table-striped">
+                <thead  class="thead-dark">
+                    <tr>
+                        <th>Nombre del cargo</th>
+                        <th>Descripcion del cargo</th>
+                        <th>Requisitos del cargo</th>
+                        <th>Salario del cargo</th>
+                        <th>Numeros de empleados</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in cargos_empleados %}
+                    <tr>
+                        <td>{{ data.nombre_cargo }}</td>
+                        <td>{{ data.descripcion_cargo }}</td>
+                        <td>{{ data.requisitos_cargo }}</td>
+                        <td>{{ data.salario }}</td>
+                        <td>{{ data.numero_empleados }}</td>
+                        <td>
+                            <a class="btn btn-primary" href="/edit_recursos_humanos/{{ proyecto.id }}/{{ data.id }}"><i class="fas fa-pen"></i></a>
+                            <a class="btn btn-danger" href="/delete_recursos_humanos/{{ proyecto.id }}/{{ data.id }}"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            {% comment %} <p>Por favor crea los cargos de tu proyecto</p> {% endcomment %}
+            {% endif %}
+    </div>
+
+    
+
+</div>

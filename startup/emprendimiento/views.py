@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.urls import reverse
 import os
-from .models import Proyecto, Financiero, Marketing, Producto, Identidad
+from .models import Proyecto, Financiero, Marketing, Producto, Identidad, CargoEmpleado
 import requests
 from django.db.models import F,Sum 
 from openai import OpenAI
@@ -294,12 +294,41 @@ def delete_producto(request, proyecto_id, producto_id):
 #--------------RECURSOS HUMANOS----------------#
 def recursos_humanos(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
-        
-        return render(request, 'proyecto/modulos/recursos_humanos/recursos_humanos.html', {'proyecto': proyecto})
+        cargo_exists = CargoEmpleado.objects.filter(proyecto_id=proyecto_id).exists()
+        if cargo_exists:
+                cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+        else:
+                cargos_empleados = None
+        return render(request, 'proyecto/modulos/recursos_humanos/recursos_humanos.html', {'proyecto': proyecto, 'cargos_empleados': cargos_empleados, 'cargo_exists': cargo_exists})
 
 def form_recursos_humanos(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
+        if request.method == 'POST':
+                nombre_cargo = request.POST['nombre_cargo']
+                descripcion_cargo = request.POST['descripcion_cargo']
+                requisitos_cargo = request.POST['requisitos_cargo']
+                salario = request.POST['salario']
+                numero_empleados = request.POST['numero_empleados']
+                recursos_humanos = CargoEmpleado(nombre_cargo=nombre_cargo, descripcion_cargo=descripcion_cargo, requisitos_cargo=requisitos_cargo, salario=salario, numero_empleados=numero_empleados, proyecto=proyecto)
+                recursos_humanos.save()
+                return redirect(reverse('recursos_humanos', args=[proyecto.id]))
         return render(request, 'proyecto/modulos/recursos_humanos/form_recursos_humanos.html', {'proyecto': proyecto})
+
+def edit_recursos_humanos(request, proyecto_id, cargos_empleados_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        cargos_empleados = CargoEmpleado.objects.get(id=cargos_empleados_id)
+        if request.method == 'POST':
+                cargos_empleados.nombre_cargo = request.POST['nombre_cargo']
+                cargos_empleados.descripcion_cargo = request.POST['descripcion_cargo']
+                cargos_empleados.requisitos_cargo = request.POST['requisitos_cargo']
+                cargos_empleados.salario = request.POST['salario']
+                cargos_empleados.numero_empleados = request.POST['numero_empleados']
+                cargos_empleados.save()
+                return redirect(reverse('recursos_humanos', args=[proyecto.id]))
+        
+        return render(request, 'proyecto/modulos/recursos_humanos/edit_recursos_humanos.html', {'proyecto': proyecto, 'cargos_empleados': cargos_empleados})
+
+
 
 #-------------IDENTIDAD DEL EMPRENDIMIENTO----------------
 def identidad(request, proyecto_id):
@@ -307,7 +336,8 @@ def identidad(request, proyecto_id):
         identidad_exists = Identidad.objects.filter(proyecto_id=proyecto_id).exists()
         if identidad_exists:
                 identidad = Identidad.objects.get(proyecto_id=proyecto_id)
-        return render(request, 'proyecto/modulos/identidad/identidad.html', {'proyecto': proyecto, 'identidad_exists': identidad_exists, 'identidad': identidad})
+                return render(request, 'proyecto/modulos/identidad/identidad.html', {'proyecto': proyecto, 'identidad_exists': identidad_exists, 'identidad': identidad})
+        return render(request, 'proyecto/modulos/identidad/identidad.html', {'proyecto': proyecto, 'identidad_exists': identidad_exists})
 
 def form_identidad(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -321,6 +351,18 @@ def form_identidad(request, proyecto_id):
                 return redirect(reverse('identidad', args=[proyecto.id]))
         return render(request, 'proyecto/modulos/identidad/form_identidad.html', {'proyecto': proyecto})
 
+def edit_identidad(request, proyecto_id, identidad_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        identidad = Identidad.objects.get(id=identidad_id)
+        if request.method == 'POST':
+                identidad_id = request.POST['identidad_id']
+                identidad.mision = request.POST['mision']
+                identidad.vision = request.POST['vision']
+                identidad.valores = request.POST['valores']
+                identidad.objetivos = request.POST['objetivos']
+                identidad.save()
+                return redirect(reverse('identidad', args=[proyecto.id]))
+        return render(request, 'proyecto/modulos/identidad/edit_identidad.html', {'proyecto': proyecto, 'identidad': identidad})
 
 #-------------ANALISIS----------------#
 def analisis(request, proyecto_id):
@@ -328,14 +370,17 @@ def analisis(request, proyecto_id):
         financiero = Financiero.objects.get(proyecto_id=proyecto_id)
         marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
         producto_list = Producto.objects.filter(proyecto_id=proyecto_id)
+        cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+        identidad = Identidad.objects.get(proyecto_id=proyecto_id)
 
 
         client = OpenAI(api_key="sk-proj-oHwgvOYovBO6XxkpPMGuT3BlbkFJBZ17uo0XxrjkGcYFYP0m")
 
  
         messages = [
-                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis detallado y la viabilidad del mismo pero solo del modulo de marketing"},
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis y la viabilidad del mismo. nota: puedes responderme en formato html"},
                 {"role": "user", "content": f"\nnombre del emprendimiento:{proyecto.nombre},categoria:{proyecto.categoria}, descripcion:{proyecto.descripcion}"},
+               {"role": "user", "content": f"\nidentidad: mision:{identidad.mision}, vision:{identidad.vision}, valores:{identidad.valores}, objetivos:{identidad.objetivos}"},
                 {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
         ]
 
@@ -344,6 +389,9 @@ def analisis(request, proyecto_id):
 
         for producto in producto_list:
                 messages.append({"role": "user", "content": f"\nproducto: nombre del producto:{producto.nombre_producto}, descripcion del producto:{producto.descripcion_producto}, categoria del producto:{producto.categoria_producto}, ciclo de vida del producto:{producto.ciclo_vida}, costo de desarrollo:{producto.costo_desarrollo}, costo de produccion:{producto.costo_produccion}, precio de venta:{producto.precio_venta}"})
+
+        for cargo in cargos_empleados:
+                messages.append({"role": "user", "content": f"\nrecursos humanos: nombre del cargo:{cargo.nombre_cargo}, descripcion del cargo:{cargo.descripcion_cargo}, requisitos del cargo:{cargo.requisitos_cargo}, salario:{cargo.salario}, numero de empleados:{cargo.numero_empleados}"})
 
         completion = client.chat.completions.create(
                 model="gpt-3.5-turbo",

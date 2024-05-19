@@ -1,0 +1,47 @@
+{% include 'components/navbar.html' %}
+
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+            <h1>Modulo Recursos Humanos</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <h5>Nombre del cargo</h5>
+                    <input type="text" class="form-control" id="nombre_cargo" name="nombre_cargo" placeholder="Ejemplo: Gerente de ventas">
+                </div>
+                <div class="form-group">
+                    <h5>Descripcion del cargo</h5>
+                    <textarea class="form-control" id="descripcion_cargo" name="descripcion_cargo" rows="3">Ejemplo: Responsable de la gestion de ventas de la empresa</textarea>
+                </div>
+                <div class="form-group">
+                    <h5>Requisitos del cargo</h5>
+                    <textarea class="form-control" id="requisitos_cargo" name="requisitos_cargo" rows="3">Ejemplo: Experiencia en ventas, manejo de personal, habilidades de comunicacion</textarea>
+                </div>
+                <div class="form-group">
+                    <h5>Salario del cargo</h5>
+                    <p>Ingresa el salario mensual del cargo</p>
+                    <input type="number" class="form-control" id="salario" name="salario" placeholder="Ejemplo: 1000000">
+                </div>
+                <div class="form-group">
+                    <h5>Numeros de empleados</h5>
+                    <p>Ingresa el numero de empleados que ocuparan este cargo</p>
+                    <input type="number" class="form-control" id="numero_empleados" name="numero_empleados" placeholder="Ejemplo: 1">
+                </div>
+                <button type="submit" class="btn btn-primary">Crear</button>
+            </form>
+    </div>
+
+</div>   

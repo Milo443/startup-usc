@@ -63,3 +63,16 @@ class Identidad(models.Model):
 
     def __str__(self):
         return self.proyecto.nombre
+
+class CargoEmpleado(models.Model):
+    nombre_cargo = models.CharField(max_length=50, null=True, blank=True)
+    descripcion_cargo = models.TextField(max_length=500, null=True, blank=True)
+    requisitos_cargo = models.TextField(max_length=500, null=True, blank=True)
+    salario = models.FloatField(null=True, blank=True)
+    numero_empleados = models.IntegerField(null=True, blank=True)
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.proyecto.nombre
+
+
