@@ -1,4 +1,6 @@
 {% include 'components/navbar.html' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 <div class="container mt-4">
     <div class="row justify-content-center align-items-center">
@@ -42,10 +44,41 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
         {% else %}
         <div class="col-md-6 text-end">
             <a class="btn btn-success" href="/form_marketing/{{ proyecto.id }}/{{financiero.id}}">Crear estrategia de marketing <i class="fas fa-plus"></i> </a>
         </div>
         {% endif %}
     </div>
+    <div clar="row">
+        <div class="col-md-12">
+            <div id="content" class="mt-4">
+                <canvas id="myChart"></canvas>
+                <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: {{ nombres|safe }},
+                        datasets: [{
+                            label: '# of Votes',
+                            data: {{ valores|safe }},
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                </script>
+            </div>
+        </div>
+
 </div>

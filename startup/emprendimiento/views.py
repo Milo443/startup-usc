@@ -15,6 +15,9 @@ from openai import OpenAI
 #-------------TEST----------------
 from django.test import TestCase, Client
 
+
+key=''
+
 # Create your views here.
 def home(request):
         return render(request, 'home.html', {})
@@ -205,7 +208,11 @@ def marketing(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         marketings = Marketing.objects.filter(proyecto_id=proyecto_id)
         marketing_exists = Marketing.objects.filter(proyecto_id=proyecto_id).exists()
-        return render(request, 'proyecto/modulos/marketing/marketing.html', {'proyecto': proyecto, 'marketings': marketings, 'marketing_exist': marketing_exists})
+        
+        nombres = [marketing.mercado_objetivo for marketing in marketings]
+        valores = [marketing.gastos_marketing for marketing in marketings]  
+
+        return render(request, 'proyecto/modulos/marketing/marketing.html', {'proyecto': proyecto, 'marketings': marketings, 'marketing_exist': marketing_exists, 'nombres': nombres, 'valores': valores})
 
 def form_marketing(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -377,11 +384,11 @@ def analisis(request, proyecto_id):
         identidad = Identidad.objects.get(proyecto_id=proyecto_id)
 
 
-        client = OpenAI(api_key="sk-proj-oHwgvOYovBO6XxkpPMGuT3BlbkFJBZ17uo0XxrjkGcYFYP0m")
+        client = OpenAI(api_key=key)
 
  
         messages = [
-                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis y la viabilidad del mismo. nota: puedes responderme en formato html"},
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis detallado, grafica de barras o pastel sobre el analisis y la viabilidad del mismo. las estrcutura de la respuesta debe ser la siguiente: analisis,vibilidad y graficas. nota: es muy importante que me responda en formato html y bootstrap 5 para poder visualizarlo en la pagina web y las graficas pueden ser scripts usando chart para ser visualizadas."},
                 {"role": "user", "content": f"\nnombre del emprendimiento:{proyecto.nombre},categoria:{proyecto.categoria}, descripcion:{proyecto.descripcion}"},
                {"role": "user", "content": f"\nidentidad: mision:{identidad.mision}, vision:{identidad.vision}, valores:{identidad.valores}, objetivos:{identidad.objetivos}"},
                 {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
@@ -397,7 +404,7 @@ def analisis(request, proyecto_id):
                 messages.append({"role": "user", "content": f"\nrecursos humanos: nombre del cargo:{cargo.nombre_cargo}, descripcion del cargo:{cargo.descripcion_cargo}, requisitos del cargo:{cargo.requisitos_cargo}, salario:{cargo.salario}, numero de empleados:{cargo.numero_empleados}"})
 
         completion = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 messages=messages
         )
 
