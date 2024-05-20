@@ -8,12 +8,12 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.urls import reverse
-import os
 from .models import Proyecto, Financiero, Marketing, Producto, Identidad, CargoEmpleado
-import requests
 from django.db.models import F,Sum 
 from openai import OpenAI
-import openai
+
+#-------------TEST----------------
+from django.test import TestCase, Client
 
 # Create your views here.
 def home(request):
@@ -168,7 +168,8 @@ def financieros(request):
 def form_financiero(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         cargo_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
-        total_salarios = CargoEmpleado.objects.aggregate(total_salarios=Sum(F('salario') * F('numero_empleados')))['total_salarios']
+        total_salario = CargoEmpleado.objects.aggregate(total_salarios=Sum(F('salario') * F('numero_empleados')))['total_salarios']
+        total_salarios = total_salario * 12
         if request.method == 'POST':
                 #proyecto_id = request.POST['proyecto_id']
                 #proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -405,3 +406,6 @@ def analisis(request, proyecto_id):
 
         return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing': marketing, 'producto': producto, 'chat_completion': completion, 'message_content': message_content})
         #return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing': marketing, 'producto': producto})
+
+
+

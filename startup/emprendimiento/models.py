@@ -4,7 +4,7 @@ from django.db import models
 
 class Proyecto(models.Model):
     nombre = models.CharField(max_length=50)
-    descripcion = models.TextField()
+    descripcion = models.TextField(max_length=1000)
     categoria = models.CharField(max_length=50)
     fecha_creacion = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     imagen = models.ImageField(upload_to='images/', null=True, blank=True)
@@ -41,9 +41,9 @@ class Marketing(models.Model):
     
 class Producto(models.Model):
     nombre_producto = models.CharField(max_length=50, null=True, blank=True)
-    descripcion_producto = models.TextField(max_length=250, null=True, blank=True)
+    descripcion_producto = models.TextField(max_length=1000, null=True, blank=True)
     categoria_producto = models.CharField(max_length=50, null=True, blank=True)
-    ciclo_vida = models.CharField(max_length=500, null=True, blank=True)
+    ciclo_vida = models.CharField(max_length=1000, null=True, blank=True)
     costo_desarrollo = models.FloatField(null=True, blank=True)  
     costo_produccion = models.FloatField(null=True, blank=True)
     precio_venta = models.FloatField(null=True, blank=True)
@@ -55,10 +55,10 @@ class Producto(models.Model):
         return self.nombre
     
 class Identidad(models.Model):
-    mision = models.TextField(max_length=250, null=True, blank=True)
-    vision = models.TextField(max_length=250, null=True, blank=True)
-    valores = models.TextField(max_length=250, null=True, blank=True)
-    objetivos = models.TextField(max_length=250, null=True, blank=True)
+    mision = models.TextField(max_length=1000, null=True, blank=True)
+    vision = models.TextField(max_length=1000, null=True, blank=True)
+    valores = models.TextField(max_length=500, null=True, blank=True)
+    objetivos = models.TextField(max_length=1000, null=True, blank=True)
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -66,8 +66,8 @@ class Identidad(models.Model):
 
 class CargoEmpleado(models.Model):
     nombre_cargo = models.CharField(max_length=50, null=True, blank=True)
-    descripcion_cargo = models.TextField(max_length=500, null=True, blank=True)
-    requisitos_cargo = models.TextField(max_length=500, null=True, blank=True)
+    descripcion_cargo = models.TextField(max_length=1000, null=True, blank=True)
+    requisitos_cargo = models.TextField(max_length=1000, null=True, blank=True)
     salario = models.FloatField(null=True, blank=True)
     numero_empleados = models.IntegerField(null=True, blank=True)
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
