@@ -28,7 +28,7 @@ class Financiero(models.Model):
         return self.proyecto.nombre
     
 class Marketing(models.Model):
-    mercado_objetivo= models.CharField(max_length=250, null=True, blank=True)
+    mercado_objetivo= models.CharField(max_length=1000, null=True, blank=True)
     segmentacion_cliente = models.CharField(max_length=250, null=True, blank=True)
     canal_marketing = models.CharField(max_length=250, null=True, blank=True)
     estrategia_precio_promocion = models.CharField(max_length=250, null=True, blank=True)

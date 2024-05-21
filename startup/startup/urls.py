@@ -75,7 +75,7 @@ urlpatterns = [
     path('edit_user/', views.edit_user, name='edit_user'),
 
 
-    
+    path('asistente_ia/', views.asistente_ia),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

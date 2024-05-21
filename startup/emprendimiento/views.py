@@ -14,6 +14,9 @@ from openai import OpenAI
 
 #-------------TEST----------------
 from django.test import TestCase, Client
+from PIL import ImageGrab
+import requests
+import requests
 
 
 key=''
@@ -415,4 +418,45 @@ def analisis(request, proyecto_id):
         #return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing': marketing, 'producto': producto})
 
 
+def asistente_ia(request):
+        # Capture screenshot of the current browser window
+        screenshot = ImageGrab.grab()
 
+        # Save the screenshot as an image file
+        screenshot.save('media/images/screenshot.png')
+
+        # Call the function with the path to the screenshot image
+        screenshot_path = "media/images/screenshot.png"
+        image_url = upload_image_to_imgbb(screenshot_path)
+
+
+        client = OpenAI(api_key=key)
+
+        messages=[
+        {"role": "system", "content": "eres un asistente virtual, recibiras una screenshot y le indicara de manera muy amigable al usuario que hacer."},
+        {"role": "user", "content": f"imagen:{image_url}"}
+        ]
+        completion = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages
+        )
+
+        message_content = completion.choices[0].message.content
+        print(message_content)
+
+        return redirect('/main/')
+
+def upload_image_to_imgbb(image_path):
+        url = "https://api.imgbb.com/1/upload"
+        params = {
+                "expiration": 600,
+                "key": "09a1260d440431ea06ce8e6c723069c6"
+        }
+        files = {
+                "image": open(image_path, "rb")
+        }
+        response = requests.post(url, params=params, files=files)
+        data = response.json()
+        image_url = data["data"]["url"]
+        print(image_url)
+        return image_url
