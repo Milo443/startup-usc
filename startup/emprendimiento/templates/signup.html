@@ -1,7 +1,61 @@
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
+
+<style>
+    body{
+        background-image: url("https://prep20202.usc.edu.co/pluginfile.php/1/theme_edumy/login_bg/1707333850/fondo-ingreso-aulas-2%20%281%29.jpg");
+    }
+
+    img	{
+        margin-bottom: 20px;
+    }
+    
+    input{
+        margin-bottom: 20px;
+    }
+
+    .card-body{
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+</style>
+
 <body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6" style="display: flex; flex-direction: column; justify-content: center; height: 100vh">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <form action="/signup/" method="POST">
+                        {% csrf_token %}
+                        <img src="https://i.ibb.co/mq6pK3c/logo.jpg" alt="logo" style="width:200px; max-width: 100%; border-radius:150px;                        ">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Correo electronico" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="password1" name="password1" placeholder="Contraseña" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirmar Contraseña" required>
+                        </div>  
+
+                        <button type="submit" class="btn btn-primary btn-lg ">Registrarse</button>
+                        <hr>
+                        <a href="/login/" class="">Acceder</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+{% comment %} <body>
 
 <div class="container-fluid">
     <form action="/signup/" method="POST">
@@ -58,3 +112,4 @@
 
 
        
+ {% endcomment %}

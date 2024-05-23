@@ -1,15 +1,30 @@
 {% load django_bootstrap5 %}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-<nav class="navbar navbar-dark bg-dark">
+<style>
+    nav{
+        background-color: #004a86;
+    
+    }
+    .logo_usc{
+        position: absolute;
+        bottom: 10;
+        right: 10;
+    }
+
+</style>
+
+
+
+<nav class="navbar" data-bs-theme="dark">
     <div class="container">
         <a class="navbar-brand" href="/main/">
-            <img src="https://i.ibb.co/mq6pK3c/logo.jpg" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+            <img src="https://i.ibb.co/mq6pK3c/logo.jpg" class="rounded-circle" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
 Bienvenido {{user}}        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarMenu" aria-controls="navbarMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="navbarMenu" aria-labelledby="navbarMenuLabel">
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="navbarMenu" aria-labelledby="navbarMenuLabel" data-bs-theme="light">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="navbarMenuLabel">Menú</h5>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
@@ -34,3 +49,6 @@ Bienvenido {{user}}        </a>
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
+
+<img class="logo_usc" src="https://i.ibb.co/Hxzmsqm/logo-USC.webp" alt="usc" style="width: 100px;">

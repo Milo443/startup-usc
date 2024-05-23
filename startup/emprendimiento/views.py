@@ -389,7 +389,6 @@ def analisis(request, proyecto_id):
 
         client = OpenAI(api_key=key)
 
- 
         messages = [
                 {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis detallado, grafica de barras o pastel sobre el analisis y la viabilidad del mismo. las estrcutura de la respuesta debe ser la siguiente: analisis,vibilidad y graficas. nota: es muy importante que me responda en formato html y bootstrap 5 para poder visualizarlo en la pagina web y las graficas pueden ser scripts usando chart para ser visualizadas."},
                 {"role": "user", "content": f"\nnombre del emprendimiento:{proyecto.nombre},categoria:{proyecto.categoria}, descripcion:{proyecto.descripcion}"},
@@ -414,9 +413,7 @@ def analisis(request, proyecto_id):
         message_content = completion.choices[0].message.content
         print(message_content)
 
-        return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing': marketing, 'producto': producto, 'chat_completion': completion, 'message_content': message_content})
-        #return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing': marketing, 'producto': producto})
-
+        return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing_list': marketing_list, 'producto_list': producto_list, 'cargos_empleados': cargos_empleados, 'identidad': identidad, 'message_content': message_content})
 
 def asistente_ia(request):
         # Capture screenshot of the current browser window
@@ -460,3 +457,21 @@ def upload_image_to_imgbb(image_path):
         image_url = data["data"]["url"]
         print(image_url)
         return image_url
+
+
+#-------------ia generador de logo----------------
+def generador_logo(request):
+        client = OpenAI(api_key=key)
+        parametro = "a logo for a technology company"
+
+        response = client.images.generate(
+        model="dall-e-3",
+        prompt=parametro,
+        size="1024x1024",
+        quality="standard",
+        n=1,
+        )
+
+        image_url = response.data[0].url
+        print(image_url)
+        return redirect(reverse('crear_proyecto'))

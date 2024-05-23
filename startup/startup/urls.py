@@ -37,7 +37,7 @@ urlpatterns = [
     path('administrator/', views.administrator),
     #------------proyecto dashboard---------------
     path('main/', views.main),
-    path('crear_proyecto/', views.crear_proyecto),
+    path('crear_proyecto/', views.crear_proyecto, name='crear_proyecto'),
     path('eliminar_proyecto/<int:proyecto_id>/', views.eliminar_proyecto, name='eliminar_proyecto'),
     path('editar_proyecto/<int:proyecto_id>/', views.editar_proyecto, name='editar_proyecto'),
 
@@ -76,6 +76,7 @@ urlpatterns = [
 
 
     path('asistente_ia/', views.asistente_ia),
+    path('generador-logo/', views.generador_logo),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
