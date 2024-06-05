@@ -4,7 +4,6 @@
 
 <style>
     .card-body{
-        height: 300px;
         max-width: 500px;
         overflow-y: hidden;
         overflow-x: hidden;
@@ -25,10 +24,9 @@
     <div class="row mb-4 text-center">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body" style="height: 300px;">
                     <h5 class="card-title">Marketing</h5>
                     <p class="card-text">
-                        
                         <canvas id="marketingCanvas"></canvas>
                         <script>
                             var data = {
@@ -37,26 +35,26 @@
                                     label: '$',
                                     data: {{values_marketing|safe}},
                                     backgroundColor: [
-                                        '#334CFF',
-                                        '#8a89a6',
-                                        '#ff9900',
-                                        '#e9967a',
                                         '#3cba9f',
                                         '#95a5a6',
                                         '#f7b6d2',
                                         '#0d8aa8',
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
                                         '#b15928',
                                         '#8e5ea2'
                                     ],
                                     borderColor: [
-                                        '#334CFF',
-                                        '#8a89a6',
-                                        '#ff9900',
-                                        '#e9967a',
                                         '#3cba9f',
                                         '#95a5a6',
                                         '#f7b6d2',
                                         '#0d8aa8',
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
                                         '#b15928',
                                         '#8e5ea2'
                                     ],
@@ -73,10 +71,7 @@
                                         legend: {
                                             position: 'left',
                                         },
-                                        title: {
-                                            display: true,
-                                            {% comment %} text: 'Gráfico de Pastel' {% endcomment %}
-                                        }
+                                        
                                     
                                     }
                                 }
@@ -90,7 +85,7 @@
         </div>
         <div class="col-md-6">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body" style="height: 300px;">
                     <h5 class="card-title">Productos/Servicios</h5>
                     <p class="card-text">
                         <canvas id="productosCanvas"></canvas>
@@ -147,7 +142,7 @@
     <div class="row text">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body" style="height: 300px;">
                     <h5 class="card-title">Financiero</h5>
                     <p class="card-text">
                         <canvas id="financieroCanvas"></canvas>
@@ -197,17 +192,13 @@
                                 }
                             });
                             </script>
-
-
-
-                        
                     </p>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body" style="height: 300px;">
                     <h5 class="card-title">Recursos Humanos</h5>
                     <p class="card-text">
                         <canvas id="recursosCanvas"></canvas>
@@ -218,8 +209,7 @@
                                     label: '$',
                                     data: {{values_recursos|safe}},
                                     backgroundColor: [
-                                        '#334CFF',
-                                        '#8a89a6',
+                                        
                                         '#ff9900',
                                         '#e9967a',
                                         '#3cba9f',
@@ -227,7 +217,9 @@
                                         '#f7b6d2',
                                         '#0d8aa8',
                                         '#b15928',
-                                        '#8e5ea2'
+                                        '#8e5ea2',
+                                        '#334CFF',
+                                        '#8a89a6',
                                     ],
                                     borderColor: [
                                         '#334CFF',
@@ -262,8 +254,6 @@
                                 }
                             });
                             </script>
-                               
-                        
                     </p>
                 </div>
             </div>
@@ -277,4 +267,60 @@
      
      </div>
     {% endif %}
+
+   
+    <div class="text-center mt-4">
+        <h3>Puntos a resolver</h3>
+    </div>
+    
+    <div class="row">
+        <!-- marketing********************** --> 
+        <div class="col-md-6">
+            <div class="card">  
+                <div class="card-body">
+                    <h5 class="card-title">Marketing</h5>
+                    <p class="card-text">
+                        {{ message_content_marketing|safe }}
+                    </p>
+                </div>            
+            </div>
+        </div>
+        <!-- producto********************** -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Productos/Servicios</h5>
+                    <p class="card-text">
+                        {{ message_content_producto|safe }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- recursos humanos********************** -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recursos Humanos</h5>
+                    <p class="card-text">
+                        {{ message_content_recursos|safe }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- financiero********************** -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Financiero</h5>
+                    <p class="card-text">
+                        {{ message_content_financiero|safe }}
+                    </p>
+                </div>
+            </div>
+
+    </div>
+
 </div>
+
+
+

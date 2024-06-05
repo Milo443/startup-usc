@@ -75,4 +75,13 @@ class CargoEmpleado(models.Model):
     def __str__(self):
         return self.proyecto.nombre
 
-
+class Feedback(models.Model):
+    analisis = models.TextField(max_length=1000, null=True, blank=True)
+    financiero = models.TextField(max_length=1000, null=True, blank=True)
+    marketing = models.TextField(max_length=1000, null=True, blank=True)
+    producto = models.TextField(max_length=1000, null=True, blank=True)
+    recursos = models.TextField(max_length=1000, null=True, blank=True)
+    identidad = models.TextField(max_length=1000, null=True, blank=True)
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.proyecto.nombre

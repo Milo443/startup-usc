@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.urls import reverse
-from .models import Proyecto, Financiero, Marketing, Producto, Identidad, CargoEmpleado
+from .models import Proyecto, Financiero, Marketing, Producto, Identidad, CargoEmpleado, Feedback
 from django.db.models import F,Sum 
 from openai import OpenAI
 
@@ -401,6 +401,8 @@ def edit_identidad(request, proyecto_id, identidad_id):
                 return redirect(reverse('identidad', args=[proyecto.id]))
         return render(request, 'proyecto/modulos/identidad/edit_identidad.html', {'proyecto': proyecto, 'identidad': identidad})
 
+
+
 #-------------ANALISIS----------------#
 def analisis(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
@@ -410,13 +412,15 @@ def analisis(request, proyecto_id):
         cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
         identidad = Identidad.objects.get(proyecto_id=proyecto_id)
 
+        
+        feedback_exists = Feedback.objects.filter(proyecto_id=proyecto_id).exists()
 
         client = OpenAI(api_key=key)
 
         messages = [
                 {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis detallado, grafica de barras o pastel sobre el analisis y la viabilidad del mismo. las estrcutura de la respuesta debe ser la siguiente: analisis,vibilidad y graficas. nota: es muy importante que me responda en formato html y bootstrap 5 para poder visualizarlo en la pagina web y las graficas pueden ser scripts usando chart para ser visualizadas."},
                 {"role": "user", "content": f"\nnombre del emprendimiento:{proyecto.nombre},categoria:{proyecto.categoria}, descripcion:{proyecto.descripcion}"},
-               {"role": "user", "content": f"\nidentidad: mision:{identidad.mision}, vision:{identidad.vision}, valores:{identidad.valores}, objetivos:{identidad.objetivos}"},
+                {"role": "user", "content": f"\nidentidad: mision:{identidad.mision}, vision:{identidad.vision}, valores:{identidad.valores}, objetivos:{identidad.objetivos}"},
                 {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
         ]
 
@@ -429,15 +433,240 @@ def analisis(request, proyecto_id):
         for cargo in cargos_empleados:
                 messages.append({"role": "user", "content": f"\nrecursos humanos: nombre del cargo:{cargo.nombre_cargo}, descripcion del cargo:{cargo.descripcion_cargo}, requisitos del cargo:{cargo.requisitos_cargo}, salario:{cargo.salario}, numero de empleados:{cargo.numero_empleados}"})
 
+        if feedback_exists:
+                feedback = Feedback.objects.get(proyecto_id=proyecto_id)
+                message_content = feedback.analisis
+        else:
+                completion = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=messages
+                )
+                message_content = completion.choices[0].message.content
+
+        #-------- marketing --------------------
+                messages = [
+                        {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de marketing, proporciona una lista de maximo 5 puntos a mejorar de los datos de marketing, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                        
+                ]
+
+                for marketing in marketing_list:
+                        messages.append({"role": "user", "content": f"\nmarketing: mercado objetivo:{marketing.mercado_objetivo}, segmentacion de cliente:{marketing.segmentacion_cliente}, canal de marketing:{marketing.canal_marketing}, estrategia de precio y promocion:{marketing.estrategia_precio_promocion}, gastos de marketing:{marketing.gastos_marketing}"})
+
+                completion = client.chat.completions.create(
+                                model="gpt-4o",
+                                messages=messages
+                )
+                message_content_marketing = completion.choices[0].message.content
+        
+        #-------- producto --------------------
+                messages = [
+                        {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de producto, proporciona una lista de maximo 5 puntos a mejorar de los datos de producto, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                        
+                ]
+
+                for producto in producto_list:
+                        messages.append({"role": "user", "content": f"\nproducto: nombre del producto:{producto.nombre_producto}, descripcion del producto:{producto.descripcion_producto}, categoria del producto:{producto.categoria_producto}, ciclo de vida del producto:{producto.ciclo_vida}, costo de desarrollo:{producto.costo_desarrollo}, costo de produccion:{producto.costo_produccion}, precio de venta:{producto.precio_venta}"})
+
+                completion = client.chat.completions.create(
+                                model="gpt-4o",
+                                messages=messages
+                )
+                message_content_producto = completion.choices[0].message.content
+
+        #-------- recursos humanos --------------------
+                messages = [
+                        {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de recursos humanos, proporciona una lista de maximo 5 puntos a mejorar de los datos de recursos humanos, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                        
+                ]
+
+                for cargo in cargos_empleados:
+                        messages.append({"role": "user", "content": f"\nrecursos humanos: nombre del cargo:{cargo.nombre_cargo}, descripcion del cargo:{cargo.descripcion_cargo}, requisitos del cargo:{cargo.requisitos_cargo}, salario:{cargo.salario}, numero de empleados:{cargo.numero_empleados}"})
+
+                completion = client.chat.completions.create(
+                                model="gpt-4o",
+                                messages=messages
+                )
+                message_content_recursos = completion.choices[0].message.content
+
+        #-------- financiero-----------------
+                messages = [
+                        {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de financiero, proporciona una lista de maximo 5 puntos a mejorar de los datos de financiero, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                        {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
+                ]   
+
+                completion = client.chat.completions.create(
+                                model="gpt-4o",
+                                messages=messages
+                )
+                message_content_financiero = completion.choices[0].message.content
+
+                feedback = Feedback(analisis=message_content,marketing=message_content_marketing,producto=message_content_producto,recursos=message_content_recursos,financiero=message_content_financiero ,proyecto=proyecto)
+                feedback.save()
+                print(message_content)
+
+        return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing_list': marketing_list, 'producto_list': producto_list, 'cargos_empleados': cargos_empleados, 'identidad': identidad, 'message_content': message_content, 'feedback': feedback})
+
+def refeedback(request, proyecto_id, feedback_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+        marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
+        producto_list = Producto.objects.filter(proyecto_id=proyecto_id)
+        cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+        identidad = Identidad.objects.get(proyecto_id=proyecto_id)
+
+        feedback_exists = Feedback.objects.filter(proyecto_id=proyecto_id).exists()
+
+        client = OpenAI(api_key=key)
+
+        messages = [
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento, proporciona un análisis detallado, grafica de barras o pastel sobre el analisis y la viabilidad del mismo. las estrcutura de la respuesta debe ser la siguiente: analisis,vibilidad y graficas. nota: es muy importante que me responda en formato html y bootstrap 5 para poder visualizarlo en la pagina web y las graficas pueden ser scripts usando chart para ser visualizadas."},
+                {"role": "user", "content": f"\nnombre del emprendimiento:{proyecto.nombre},categoria:{proyecto.categoria}, descripcion:{proyecto.descripcion}"},
+                {"role": "user", "content": f"\nidentidad: mision:{identidad.mision}, vision:{identidad.vision}, valores:{identidad.valores}, objetivos:{identidad.objetivos}"},
+                {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
+        ]
+
+        for marketing in marketing_list:
+                messages.append({"role": "user", "content": f"\nmarketing: mercado objetivo:{marketing.mercado_objetivo}, segmentacion de cliente:{marketing.segmentacion_cliente}, canal de marketing:{marketing.canal_marketing}, estrategia de precio y promocion:{marketing.estrategia_precio_promocion}, gastos de marketing:{marketing.gastos_marketing}"})
+
+        for producto in producto_list:
+                messages.append({"role": "user", "content": f"\nproducto: nombre del producto:{producto.nombre_producto}, descripcion del producto:{producto.descripcion_producto}, categoria del producto:{producto.categoria_producto}, ciclo de vida del producto:{producto.ciclo_vida}, costo de desarrollo:{producto.costo_desarrollo}, costo de produccion:{producto.costo_produccion}, precio de venta:{producto.precio_venta}"})
+
+        for cargo in cargos_empleados:
+                messages.append({"role": "user", "content": f"\nrecursos humanos: nombre del cargo:{cargo.nombre_cargo}, descripcion del cargo:{cargo.descripcion_cargo}, requisitos del cargo:{cargo.requisitos_cargo}, salario:{cargo.salario}, numero de empleados:{cargo.numero_empleados}"})
+
+       
         completion = client.chat.completions.create(
                 model="gpt-4o",
                 messages=messages
         )
-
         message_content = completion.choices[0].message.content
-        print(message_content)
 
-        return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing_list': marketing_list, 'producto_list': producto_list, 'cargos_empleados': cargos_empleados, 'identidad': identidad, 'message_content': message_content})
+#-------- marketing --------------------
+        messages = [
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de marketing, proporciona una lista de maximo 5 puntos a mejorar de los datos de marketing, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                
+        ]
+
+        for marketing in marketing_list:
+                messages.append({"role": "user", "content": f"\nmarketing: mercado objetivo:{marketing.mercado_objetivo}, segmentacion de cliente:{marketing.segmentacion_cliente}, canal de marketing:{marketing.canal_marketing}, estrategia de precio y promocion:{marketing.estrategia_precio_promocion}, gastos de marketing:{marketing.gastos_marketing}"})
+
+        completion = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=messages
+        )
+        message_content_marketing = completion.choices[0].message.content
+
+#-------- producto --------------------
+        messages = [
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de producto, proporciona una lista de maximo 5 puntos a mejorar de los datos de producto, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                
+        ]
+
+        for producto in producto_list:
+                messages.append({"role": "user", "content": f"\nproducto: nombre del producto:{producto.nombre_producto}, descripcion del producto:{producto.descripcion_producto}, categoria del producto:{producto.categoria_producto}, ciclo de vida del producto:{producto.ciclo_vida}, costo de desarrollo:{producto.costo_desarrollo}, costo de produccion:{producto.costo_produccion}, precio de venta:{producto.precio_venta}"})
+
+        completion = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=messages
+        )
+        message_content_producto = completion.choices[0].message.content
+
+#-------- recursos humanos --------------------
+        messages = [
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de recursos humanos, proporciona una lista de maximo 5 puntos a mejorar de los datos de recursos humanos, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                
+        ]
+
+        for cargo in cargos_empleados:
+                messages.append({"role": "user", "content": f"\nrecursos humanos: nombre del cargo:{cargo.nombre_cargo}, descripcion del cargo:{cargo.descripcion_cargo}, requisitos del cargo:{cargo.requisitos_cargo}, salario:{cargo.salario}, numero de empleados:{cargo.numero_empleados}"})
+
+        completion = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=messages
+        )
+        message_content_recursos = completion.choices[0].message.content
+
+#-------- financiero-----------------
+        messages = [
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. Por favor, analiza el siguiente emprendimiento este solo es el modulo de financiero, proporciona una lista de maximo 5 puntos a mejorar de los datos de financiero, nota: es muy importante que la respuesta este dentro de las etiquetas <ul></ul> y cada punto en <li></li> aplicando bootstrap 5 para poder visualizarlo en la pagina web."},
+                {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
+        ]   
+
+        completion = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=messages
+        )
+        message_content_financiero = completion.choices[0].message.content
+
+        feedback = Feedback(analisis=message_content,marketing=message_content_marketing,producto=message_content_producto,recursos=message_content_recursos,financiero=message_content_financiero ,proyecto=proyecto, id=feedback_id)
+        feedback.save()
+        return redirect(reverse('analisis', args=[proyecto_id]))
+
+
+
+def dahsboard(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+        marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
+        producto_list = Producto.objects.filter(proyecto_id=proyecto_id)
+        cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+        identidad = Identidad.objects.get(proyecto_id=proyecto_id)
+
+        financiero_exists = Financiero.objects.filter(proyecto_id=proyecto_id).exists()
+        marketing_exists = Marketing.objects.filter(proyecto_id=proyecto_id).exists()
+        producto_exists = Producto.objects.filter(proyecto_id=proyecto_id).exists()
+        cargos_empleados_exists = CargoEmpleado.objects.filter(proyecto_id=proyecto_id).exists()
+
+        if financiero_exists and marketing_exists and producto_exists and cargos_empleados_exists:
+                modulos_exists = True
+        else:
+                modulos_exists = False
+                
+        labels_financiero = ['Ventas', 'Costos de produccion', 'Gastos administrativos', 'Capital propio', 'Prestamo', 'Inversores']
+        values_financiero = [financiero.ventas, financiero.costos_produccion, financiero.gastos_administrativos, financiero.capital_propio, financiero.prestamo, financiero.inversores]
+
+        #------marketing----------------
+        labels_marketing = []
+        
+        values_marketing = []
+        for marketing in marketing_list:
+                labels_marketing.append(marketing.canal_marketing)
+                values_marketing.append(marketing.gastos_marketing)
+
+        #------producto----------------
+        labels_producto = []
+        values_producto = []
+        for producto in producto_list:
+                labels_producto.append(producto.nombre_producto)
+                values_producto.append(producto.precio_venta)
+        
+        #------recursos humanos----------------
+        labels_recursos = []
+        values_recursos = []
+        for cargo in cargos_empleados:
+                labels_recursos.append(cargo.nombre_cargo)
+                values_recursos.append(cargo.salario)
+
+        feedback_exists = Feedback.objects.filter(proyecto_id=proyecto_id).exists()
+        
+        if feedback_exists:
+                feedback = Feedback.objects.get(proyecto_id=proyecto_id)
+                message_content_marketing = feedback.marketing
+                message_content_producto = feedback.producto
+                message_content_recursos = feedback.recursos
+                message_content_financiero = feedback.financiero
+        
+        else:
+                message_content_marketing = ''
+                message_content_producto = ''
+                message_content_recursos = ''
+                message_content_financiero = ''
+                
+        
+        return render(request, 'proyecto/modulos/dashboard/dashboard.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing_list': marketing_list, 'producto_list': producto_list, 'cargos_empleados': cargos_empleados, 'labels_financiero': labels_financiero, 'values_financiero': values_financiero, 'labels_marketing': labels_marketing, 'values_marketing': values_marketing, 'labels_producto': labels_producto, 'values_producto': values_producto, 'labels_recursos': labels_recursos, 'values_recursos': values_recursos, 'modulos_exists': modulos_exists, 'message_content_marketing': message_content_marketing, 'message_content_producto': message_content_producto, 'message_content_recursos': message_content_recursos, 'message_content_financiero': message_content_financiero})
+
+
+
 
 def asistente_ia(request):
         # Capture screenshot of the current browser window
@@ -484,7 +713,7 @@ def upload_image_to_imgbb(image_path):
 
 
 
-def analisis(request, proyecto_id):
+#def analisis(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         financiero = Financiero.objects.get(proyecto_id=proyecto_id)
         marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
@@ -527,53 +756,4 @@ def analisis(request, proyecto_id):
 
 
 
-def dahsboard(request, proyecto_id):
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
-        marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
-        producto_list = Producto.objects.filter(proyecto_id=proyecto_id)
-        cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
-
-        financiero_exists = Financiero.objects.filter(proyecto_id=proyecto_id).exists()
-        marketing_exists = Marketing.objects.filter(proyecto_id=proyecto_id).exists()
-        producto_exists = Producto.objects.filter(proyecto_id=proyecto_id).exists()
-        cargos_empleados_exists = CargoEmpleado.objects.filter(proyecto_id=proyecto_id).exists()
-
-        if financiero_exists and marketing_exists and producto_exists and cargos_empleados_exists:
-                modulos_exists = True
-        else:
-                modulos_exists = False
-                
-
-
-
-
-
-        labels_financiero = ['Ventas', 'Costos de produccion', 'Gastos administrativos', 'Capital propio', 'Prestamo', 'Inversores']
-        values_financiero = [financiero.ventas, financiero.costos_produccion, financiero.gastos_administrativos, financiero.capital_propio, financiero.prestamo, financiero.inversores]
-
-        #------marketing----------------
-        labels_marketing = []
-        
-        values_marketing = []
-        for marketing in marketing_list:
-                labels_marketing.append(marketing.canal_marketing)
-                values_marketing.append(marketing.gastos_marketing)
-
-        #------producto----------------
-        labels_producto = []
-        values_producto = []
-        for producto in producto_list:
-                labels_producto.append(producto.nombre_producto)
-                values_producto.append(producto.precio_venta)
-        
-        #------recursos humanos----------------
-        labels_recursos = []
-        values_recursos = []
-        for cargo in cargos_empleados:
-                labels_recursos.append(cargo.nombre_cargo)
-                values_recursos.append(cargo.salario)
-
-        
-        return render(request, 'proyecto/modulos/dashboard/dashboard.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing_list': marketing_list, 'producto_list': producto_list, 'cargos_empleados': cargos_empleados, 'labels_financiero': labels_financiero, 'values_financiero': values_financiero, 'labels_marketing': labels_marketing, 'values_marketing': values_marketing, 'labels_producto': labels_producto, 'values_producto': values_producto, 'labels_recursos': labels_recursos, 'values_recursos': values_recursos, 'modulos_exists': modulos_exists})
         

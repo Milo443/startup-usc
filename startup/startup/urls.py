@@ -70,6 +70,7 @@ urlpatterns = [
 
     #--------------analisis-----------------
     path('analisis/<int:proyecto_id>/', views.analisis, name='analisis'),
+    path('refeedback/<int:proyecto_id>/<int:feedback_id>/', views.refeedback, name='refeedback'),
 
     #--------------dashboard-----------------
     path('dashboard/<int:proyecto_id>/', views.dahsboard, name='dashboard'),
