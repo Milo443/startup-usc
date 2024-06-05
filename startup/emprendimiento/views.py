@@ -111,18 +111,42 @@ def main(request):
 
 
 def crear_proyecto(request):
-    if request.method == 'POST':
-        nombre = request.POST['nombre']
-        descripcion = request.POST['descripcion']
-        categoria = request.POST['categoria']
-        imagen = request.FILES.get('imagen')  # Usa .get() en lugar de ['imagen']
-        if imagen:  # Verifica si se proporcionó una imagen
-            proyecto = Proyecto(nombre=nombre, descripcion=descripcion, categoria=categoria, imagen=imagen, user=request.user)
+        if request.method == 'POST':
+                nombre = request.POST['nombre']
+                descripcion = request.POST['descripcion']
+                categoria = request.POST['categoria']
+                imagen = request.FILES.get('imagen')  # Usa .get() en lugar de ['imagen']
+                if imagen:  # Verifica si se proporcionó una imagen
+                        proyecto = Proyecto(nombre=nombre, descripcion=descripcion, categoria=categoria, imagen=imagen, user=request.user)
+                else:
+                        proyecto = Proyecto(nombre=nombre, descripcion=descripcion, categoria=categoria, user=request.user)
+                proyecto.save()
+                return redirect('/main/')
+        return render(request, 'proyecto/form_proyecto.html', {})
+
+#-------------ia generador de logo----------------
+def generador_logo(request):
+        if request.method == 'POST':
+                nombre = request.POST.get('nombre')
+                descripcion = request.POST.get('descripcion')
+
+        
+                client = OpenAI(api_key=key)
+                parametro = "a logo for a technology company named " + nombre + " that is modern and techy. description: " + descripcion
+
+                response = client.images.generate(
+                model="dall-e-3",
+                prompt=parametro,
+                size="1024x1024",
+                quality="standard",
+                n=1,
+                )
+
+                image_url = response.data[0].url
+                print(image_url)
+                return redirect(reverse('crear_proyecto'), {'image_url': image_url})
         else:
-            proyecto = Proyecto(nombre=nombre, descripcion=descripcion, categoria=categoria, user=request.user)
-        proyecto.save()
-        return redirect('/main/')
-    return render(request, 'proyecto/form_proyecto.html', {})
+                return render(request, 'proyecto/generador_logo.html', {})
 
 def editar_proyecto(request, proyecto_id):
         user_login = request.user
@@ -333,7 +357,7 @@ def edit_recursos_humanos(request, proyecto_id, cargos_empleados_id):
         if request.method == 'POST':
                 cargos_empleados.nombre_cargo = request.POST['nombre_cargo']
                 cargos_empleados.descripcion_cargo = request.POST['descripcion_cargo']
-                cargos_empleados.requisitos_cargo = request.POST['requisitos_cargo']
+                cargos_empleados  .requisitos_cargo = request.POST['requisitos_cargo']
                 cargos_empleados.salario = request.POST['salario']
                 cargos_empleados.numero_empleados = request.POST['numero_empleados']
                 cargos_empleados.save()
@@ -459,19 +483,97 @@ def upload_image_to_imgbb(image_path):
         return image_url
 
 
-#-------------ia generador de logo----------------
-def generador_logo(request):
-        client = OpenAI(api_key=key)
-        parametro = "a logo for a technology company"
 
-        response = client.images.generate(
-        model="dall-e-3",
-        prompt=parametro,
-        size="1024x1024",
-        quality="standard",
-        n=1,
+def analisis(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+        marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
+        producto_list = Producto.objects.filter(proyecto_id=proyecto_id)
+        cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+        identidad = Identidad.objects.get(proyecto_id=proyecto_id)
+
+
+        client = OpenAI(api_key=key)
+
+        messages = [
+                {"role": "system", "content": "Eres un experto en análisis de emprendimientos emergentes. analiza el siguiente emprendimiento, proporciona un análisis detallado."},
+                {"role": "system", "content": "genera graficas de barras y pastel sobre el analisis."},
+                {"role": "system", "content": " nota: la respuesta debe ser en formato html. las graficas deben ser scripts usando la libreria chart para ser visualizadas."},
+                {"role": "user", "content": f"\nnombre del emprendimiento:{proyecto.nombre},categoria:{proyecto.categoria}, descripcion:{proyecto.descripcion}"},
+               {"role": "user", "content": f"\nidentidad: mision:{identidad.mision}, vision:{identidad.vision}, valores:{identidad.valores}, objetivos:{identidad.objetivos}"},
+                {"role": "user", "content": f"\nfinanciero: ventas:{financiero.ventas}, costos de produccion:{financiero.costos_produccion}, gastos administrativos:{financiero.gastos_administrativos}, capital propio:{financiero.capital_propio}, prestamo:{financiero.prestamo}, inversores:{financiero.inversores}"}
+        ]
+
+        for marketing in marketing_list:
+                messages.append({"role": "user", "content": f"\nmarketing: mercado objetivo:{marketing.mercado_objetivo}, segmentacion de cliente:{marketing.segmentacion_cliente}, canal de marketing:{marketing.canal_marketing}, estrategia de precio y promocion:{marketing.estrategia_precio_promocion}, gastos de marketing:{marketing.gastos_marketing}"})
+
+        for producto in producto_list:
+                messages.append({"role": "user", "content": f"\nproducto: nombre del producto:{producto.nombre_producto}, descripcion del producto:{producto.descripcion_producto}, categoria del producto:{producto.categoria_producto}, ciclo de vida del producto:{producto.ciclo_vida}, costo de desarrollo:{producto.costo_desarrollo}, costo de produccion:{producto.costo_produccion}, precio de venta:{producto.precio_venta}"})
+
+        for cargo in cargos_empleados:
+                messages.append({"role": "user", "content": f"\nrecursos humanos: nombre del cargo:{cargo.nombre_cargo}, descripcion del cargo:{cargo.descripcion_cargo}, requisitos del cargo:{cargo.requisitos_cargo}, salario:{cargo.salario}, numero de empleados:{cargo.numero_empleados}"})
+
+        completion = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages
         )
 
-        image_url = response.data[0].url
-        print(image_url)
-        return redirect(reverse('crear_proyecto'))
+        message_content = completion.choices[0].message.content
+        print(message_content)
+
+        return render(request, 'proyecto/modulos/analisis/analisis.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing_list': marketing_list, 'producto_list': producto_list, 'cargos_empleados': cargos_empleados, 'identidad': identidad, 'message_content': message_content})
+
+
+
+
+
+def dahsboard(request, proyecto_id):
+        proyecto = Proyecto.objects.get(id=proyecto_id)
+        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+        marketing_list = Marketing.objects.filter(proyecto_id=proyecto_id)
+        producto_list = Producto.objects.filter(proyecto_id=proyecto_id)
+        cargos_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+
+        financiero_exists = Financiero.objects.filter(proyecto_id=proyecto_id).exists()
+        marketing_exists = Marketing.objects.filter(proyecto_id=proyecto_id).exists()
+        producto_exists = Producto.objects.filter(proyecto_id=proyecto_id).exists()
+        cargos_empleados_exists = CargoEmpleado.objects.filter(proyecto_id=proyecto_id).exists()
+
+        if financiero_exists and marketing_exists and producto_exists and cargos_empleados_exists:
+                modulos_exists = True
+        else:
+                modulos_exists = False
+                
+
+
+
+
+
+        labels_financiero = ['Ventas', 'Costos de produccion', 'Gastos administrativos', 'Capital propio', 'Prestamo', 'Inversores']
+        values_financiero = [financiero.ventas, financiero.costos_produccion, financiero.gastos_administrativos, financiero.capital_propio, financiero.prestamo, financiero.inversores]
+
+        #------marketing----------------
+        labels_marketing = []
+        
+        values_marketing = []
+        for marketing in marketing_list:
+                labels_marketing.append(marketing.canal_marketing)
+                values_marketing.append(marketing.gastos_marketing)
+
+        #------producto----------------
+        labels_producto = []
+        values_producto = []
+        for producto in producto_list:
+                labels_producto.append(producto.nombre_producto)
+                values_producto.append(producto.precio_venta)
+        
+        #------recursos humanos----------------
+        labels_recursos = []
+        values_recursos = []
+        for cargo in cargos_empleados:
+                labels_recursos.append(cargo.nombre_cargo)
+                values_recursos.append(cargo.salario)
+
+        
+        return render(request, 'proyecto/modulos/dashboard/dashboard.html', {'proyecto': proyecto, 'financiero': financiero, 'marketing_list': marketing_list, 'producto_list': producto_list, 'cargos_empleados': cargos_empleados, 'labels_financiero': labels_financiero, 'values_financiero': values_financiero, 'labels_marketing': labels_marketing, 'values_marketing': values_marketing, 'labels_producto': labels_producto, 'values_producto': values_producto, 'labels_recursos': labels_recursos, 'values_recursos': values_recursos, 'modulos_exists': modulos_exists})
+        

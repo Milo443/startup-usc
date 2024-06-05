@@ -1,11 +1,15 @@
 {% include 'components/navbar.html' %}
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
             <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+            {{ message_content|safe }}
+          </div>
+      </div>
+</div>
             {% comment %} <h1>Modulo Análisis</h1> {% endcomment %}
        {% comment %}  <div id="accordion">
             <div class="card">
@@ -55,10 +59,10 @@
             </div>
           </div>
  {% endcomment %}    
-          {{ message_content|safe }}
+{% comment %}           {{ message_content|safe }}
         </div>
     </div>
-</div>
+</div> {% endcomment %}
 {% comment %}     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         var content = document.getElementById("content");

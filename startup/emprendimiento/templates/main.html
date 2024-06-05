@@ -29,7 +29,12 @@
                         </div>
                     </div>
                     <div class="col-md-4">
+                        {% if proyecto.imagen and proyecto.imagen.url %}
                         <img src="{{proyecto.imagen.url}}" class="img-fluid rounded-end" alt="Project Image">
+                        {% else %}
+                        <img src="https://i.ibb.co/XJsKR3b/placeholder.png" class="img-fluid rounded-end" alt="Project Image">
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

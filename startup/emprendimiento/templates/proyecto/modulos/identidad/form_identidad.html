@@ -15,10 +15,13 @@
     </div>
 </div>
 <div class="container">
+    
+
+
 
 <form method="POST"> 
-    
     {% csrf_token %}
+
     <div class="form-group">
         <h5>Mision:</h5>
         <p>Defina la razón de ser del emprendimiento, describe el propósito fundamental y la actividad principal a la que se dedica. Responde a la pregunta ¿Qué hacemos?</p>
@@ -43,7 +46,36 @@
         {% comment %} <label for="objetivos">Objetivos:</label> {% endcomment %}
         <textarea class="form-control" id="objetivos" name="objetivos" rows="3" required></textarea>
     </div>
-    <button type="submit" class="btn btn-primary">Guardar</button>
+
+    {% comment %} <div class="form-group">
+        <h5>Definir logo:</h5>
+        <p>Sube una imagen o genera un logo con inteligencia artificial.</p>
+        <img id="preview" src="#" alt="Preview" style="display: none; max-width: 200px; max-height: 200px;">
+        <input type="file" class="form-control" id="imagen" name="imagen">
+        <br>
+        <a href="/generador-logo/" class="btn btn-secondary mt-2">Generar Logo</a>
+    </div> {% endcomment %}
+
+    <button type="submit" class="btn btn-primary">Guardar <i class="fas fa-save"></i></button>
 </form>
 
 </div>
+
+
+<script>
+    document.getElementById('imagen').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+    
+        reader.onloadend = function() {
+            document.getElementById('preview').src = reader.result;
+            document.getElementById('preview').style.display = 'block';
+        }
+    
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('preview').src = "";
+        }
+    });
+    </script>

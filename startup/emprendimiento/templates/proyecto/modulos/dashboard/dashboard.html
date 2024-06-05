@@ -1,0 +1,280 @@
+
+{% include 'components/navbar.html' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .card-body{
+        height: 300px;
+        max-width: 500px;
+        overflow-y: hidden;
+        overflow-x: hidden;
+        center: true;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="col-md-6">
+        <a class="btn btn-primary" href="/gestionar_proyecto/{{ proyecto.id }}"><i class="fas fa-arrow-left"></i></a>
+        <h1>Dashboard</h1>
+    </div>
+
+    {% if modulos_exists %}
+    <div class="text-center">
+        <h3>Vista general</h3>
+    </div>
+    <div class="row mb-4 text-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Marketing</h5>
+                    <p class="card-text">
+                        
+                        <canvas id="marketingCanvas"></canvas>
+                        <script>
+                            var data = {
+                                labels: {{labels_marketing|safe}},
+                                datasets: [{
+                                    label: '$',
+                                    data: {{values_marketing|safe}},
+                                    backgroundColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderWidth: 1 
+                                }]
+                            }
+                            var ctx = document.getElementById('marketingCanvas').getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'pie',
+                                data: data,
+                                options: {
+                                    responsive: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'left',
+                                        },
+                                        title: {
+                                            display: true,
+                                            {% comment %} text: 'Gráfico de Pastel' {% endcomment %}
+                                        }
+                                    
+                                    }
+                                }
+                            });
+                            </script>
+                        
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Productos/Servicios</h5>
+                    <p class="card-text">
+                        <canvas id="productosCanvas"></canvas>
+                        <script>
+                            var data = {
+                                labels: {{labels_producto|safe}},
+                                datasets: [{
+                                    label: '',
+                                    data: {{values_producto|safe}},
+                                    backgroundColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderWidth: 1 
+                                }]
+                            }
+                            var ctx = document.getElementById('productosCanvas').getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: data,
+                                options: {
+                                    responsive: false,
+                                    indexAxis: 'y',
+                                }
+                            });
+                            </script>
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row text">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Financiero</h5>
+                    <p class="card-text">
+                        <canvas id="financieroCanvas"></canvas>
+                        <script>
+                            var data = {
+                                labels: {{labels_financiero|safe}},
+                                datasets: [{
+                                    label: '# of Votes',
+                                    data: {{values_financiero|safe}},
+                                    backgroundColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderWidth: 1 
+                                }]
+                            }
+                            var ctx = document.getElementById('financieroCanvas').getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: data,
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                            </script>
+
+
+
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recursos Humanos</h5>
+                    <p class="card-text">
+                        <canvas id="recursosCanvas"></canvas>
+                        <script>
+                            var data = {
+                                labels: {{labels_recursos|safe}},
+                                datasets: [{
+                                    label: '$',
+                                    data: {{values_recursos|safe}},
+                                    backgroundColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderColor: [
+                                        '#334CFF',
+                                        '#8a89a6',
+                                        '#ff9900',
+                                        '#e9967a',
+                                        '#3cba9f',
+                                        '#95a5a6',
+                                        '#f7b6d2',
+                                        '#0d8aa8',
+                                        '#b15928',
+                                        '#8e5ea2'
+                                    ],
+                                    borderWidth: 1 
+                                }]
+                            }
+                            var ctx = document.getElementById('recursosCanvas').getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: data,
+                                options: {
+                                    responsive: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'left',
+                                        },
+                                        title: {
+                                            display: true,
+                                            {% comment %} text: 'Gráfico de Pastel' {% endcomment %}
+                                        }
+                                    }
+                                }
+                            });
+                            </script>
+                               
+                        
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+     <div class="container text-center" style="color:red;">
+     <h1>No hay datos en los modulos</h1>
+     <p>Por favor crea los modulos de tu proyecto</p>
+     <i class="fas fa-exclamation-triangle" style="font-size: 30px;"></i>
+     
+     </div>
+    {% endif %}
+</div>

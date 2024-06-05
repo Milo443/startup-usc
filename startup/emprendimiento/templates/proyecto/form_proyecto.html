@@ -31,15 +31,59 @@
 
             <div class="form-group mt-2">
                 <label for="imagen">Imagen:</label>
-                <img id="preview" src="#" alt="Preview" style="display: none; max-width: 200px; max-height: 200px;">
-                <input type="file" class="form-control-file" id="imagen" name="imagen">
+                <img id="preview" src="{{image_url}}" alt="Preview" style="display: none; max-width: 200px; max-height: 200px;">
+                <input type="file" class="form-control" id="imagen" name="imagen">
             </div>
 
-            <a href="/generador-logo/" class="btn btn-secondary mt-2">Generar Logo</a>
+            <a href="" id="generar" name="generar" class="btn btn-secondary mt-2">Generar Logo</a>
 
+            <br>
             <input type="submit" class="btn btn-primary mt-2" value="Crear startup">
+
         </form>
     </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        document.querySelector('form').addEventListener('click', function(e) {
+            e.preventDefault();
+            var nombre = document.getElementById('nombre').value;
+            var descripcion = document.getElementById('descripcion').value;
+            // Do something with the captured data
+            document.getElementById('generar').addEventListener('click', function(e) {
+                generar_logo(nombre, descripcion);
+            });
+        });
+        
+
+        function generar_logo(nombre, descripcion){
+            // Do something to generate the logo
+            if (!nombre || !descripcion) {
+                console.log('Por favor, ingrese el nombre y la descripción de la startup');
+            } else {
+                console.log("generando logo")
+                $.ajax({
+                    url: '/generador-logo/',  // replace with the path to your Django view
+                    type: 'post',
+                    data: {
+                        'nombre': nombre,
+                        'descripcion': descripcion,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'  // Django requires this for security
+                    },
+                    success: function(response) {
+                        console.log(response);
+                    }
+                });
+                
+            }
+            
+        }
+    </script>
+
+
+
+
     <script>
         document.getElementById('imagen').addEventListener('change', function(e) {
             var file = e.target.files[0];

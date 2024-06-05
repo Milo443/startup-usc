@@ -71,6 +71,9 @@ urlpatterns = [
     #--------------analisis-----------------
     path('analisis/<int:proyecto_id>/', views.analisis, name='analisis'),
 
+    #--------------dashboard-----------------
+    path('dashboard/<int:proyecto_id>/', views.dahsboard, name='dashboard'),
+
     #-------------usuario----------------
     path('edit_user/', views.edit_user, name='edit_user'),
 
