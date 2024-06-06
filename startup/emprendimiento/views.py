@@ -298,11 +298,15 @@ def form_financiero(request, proyecto_id):
     # Obtiene el proyecto con el ID dado desde la base de datos
     proyecto = Proyecto.objects.get(id=proyecto_id)
     # Obtiene los cargos de empleados asociados al proyecto
-    cargo_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+    cargo_empleados_exists = CargoEmpleado.objects.filter(proyecto_id=proyecto_id).exists()
+    if cargo_empleados_exists:
+        cargo_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
     # Calcula el total de salarios multiplicando el salario por el número de empleados y por 12 meses
-    total_salario = CargoEmpleado.objects.aggregate(total_salarios=Sum(F('salario') * F('numero_empleados')))['total_salarios']
-    total_salarios = total_salario * 12
-    
+        total_salario = CargoEmpleado.objects.aggregate(total_salarios=Sum(F('salario') * F('numero_empleados')))['total_salarios']
+        total_salarios = total_salario * 12
+    else:
+        total_salarios = 0
+
     # Verifica si se ha enviado el formulario por el método POST
     if request.method == 'POST':
         # Obtiene los datos ingresados en el formulario
@@ -387,8 +391,9 @@ def producto(request, proyecto_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
         producto_exists = Producto.objects.filter(proyecto_id=proyecto_id).exists()
         if producto_exists:
-                productos = Producto.objects.get(proyecto_id=proyecto_id)
-                productos = Producto.objects.filter(proyecto_id=proyecto_id)
+                #productos = Producto.objects.get(proyecto=proyecto)
+                #productos = Producto.objects.filter(proyecto_id=proyecto_id)
+                productos = Producto.objects.filter(proyecto_id=proyecto_id).order_by('id')
         else:
                 productos = None
 
@@ -758,7 +763,7 @@ def dahsboard(request, proyecto_id):
         feedback_exists = Feedback.objects.filter(proyecto_id=proyecto_id).exists()
         
         if feedback_exists:
-                feedback = Feedback.objects.get(proyecto_id=proyecto_id)
+                feedback = Feedback.objects.filter(proyecto_id=proyecto_id).latest('id')
                 message_content_marketing = feedback.marketing
                 message_content_producto = feedback.producto
                 message_content_recursos = feedback.recursos
