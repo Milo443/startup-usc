@@ -30,19 +30,28 @@ def home(request):
 
 #-------------login & register----------------
 def signup(request):
+        #Si el método de la solicitud es GET, renderiza la página de registro con el formulario de creación de usuario.
         if request.method == 'GET':
                 return render(request, 'signup.html', {'form': UserCreationForm})
         else:
+                #Obtiene el nombre de usuario, correo electrónico y contraseña del formulario enviado.
+                
                 username = request.POST['username']
                 email = request.POST['email']
                 password = request.POST['password1']
+                
+                #Verifica que ambas contraseñas coincidan.
                 if request.POST["password1"] == request.POST["password2"]:
                         try:
+                                # Crea un nuevo usuario con las credenciales proporcionadas y lo guarda en la base de datos.
                                 user = User.objects.create_user(username=username,email=email,password=password)
                                 user.save()
+                                # Redirige al usuario a la página de inicio de sesión.
                                 return redirect('/login/')
                         except Exception as e:
+                                #En caso de error, devuelve el mensaje de excepción.
                                 return HttpResponse(e)
+                ## Si las contraseñas no coinciden, devuelve un mensaje de error.
                 return HttpResponse('Password no es identico')
 
 def user_login(request):
