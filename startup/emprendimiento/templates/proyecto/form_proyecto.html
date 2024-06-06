@@ -35,7 +35,7 @@
                 <input type="file" class="form-control" id="imagen" name="imagen">
             </div>
 
-            <a href="" id="generar" name="generar" class="btn btn-secondary mt-2">Generar Logo</a>
+            {% comment %} <a href="" id="generar" name="generar" class="btn btn-secondary mt-2">Generar Logo</a> {% endcomment %}
 
             <br>
             <input type="submit" class="btn btn-primary mt-2" value="Crear startup">
@@ -45,7 +45,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <script>
+{% comment %}     <script>
         document.querySelector('form').addEventListener('click', function(e) {
             e.preventDefault();
             var nombre = document.getElementById('nombre').value;
@@ -80,7 +80,7 @@
             
         }
     </script>
-
+ {% endcomment %}
 
 
 
