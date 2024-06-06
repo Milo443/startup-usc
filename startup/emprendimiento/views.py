@@ -53,6 +53,7 @@ def signup(request):
                                 return HttpResponse(e)
                 ## Si las contraseñas no coinciden, devuelve un mensaje de error.
                 return HttpResponse('Password no es identico')
+        #Fin de SignUp
 
 def user_login(request):
         if request.method == 'GET':
