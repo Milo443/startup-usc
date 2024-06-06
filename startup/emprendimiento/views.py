@@ -91,74 +91,109 @@ def logout(request):
 
 #-------------ADMINISTRADOR----------------
 def administrator(request):
+        
+        # Obtiene todos los usuarios y renderiza la página del administrador con la lista de usuarios.
         users = User.objects.all()
         return render(request, 'admin/admin.html', {'users': users})
 
 def delete_user_admin(request, user_id):
+        
+        #Intenta obtener el usuario por ID y eliminarlo.
         try:
                 user = User.objects.get(id=user_id)
                 user.delete()
+                
+                ## Si se elimina con éxito, muestra un mensaje de éxito y redirige a la página del administrador.
                 messages.success(request, 'Usuario eliminado con éxito.')
                 return redirect('/administrator/')
         except User.DoesNotExist:
+                
+                #Si el usuario no existe, devuelve un mensaje de error.
                 return HttpResponse('Usuario no encontrado')
 
 def edit_user_admin(request, user_id):
+        
+        # Obtiene el usuario por ID y renderiza la página de edición del administrador con los datos del usuario.
         user = User.objects.get(id=user_id)
         return render(request, 'admin/edit_user_admin.html', {'user': user})
 
 #-------------USUARIO---------------------------
 def edit_user(request):
+        # Obtiene el usuario que ha iniciado sesión.
         user_login = request.user
+        
+        # Si el método de la solicitud es POST, actualiza la información del usuario.
         if request.method == 'POST':
                 user_id = request.POST['user_id']
                 user = User.objects.get(id=user_id)
+                
+                # Actualiza el nombre de usuario y el correo electrónico.
                 user.username = request.POST['username']
                 user.email = request.POST['email']
+                
+                # Actualiza la contraseña.
                 user.set_password(request.POST['password'])
                 user.save()
+                
+                # Redirige al usuario a la página de inicio de sesión después de la actualización.
                 return redirect('/login/')
+        
+        # Renderiza la página de edición de usuario.
         return render(request, 'user/edit_user.html', {})
+
 
 
 #-------------PROYECTO DASHBOARD----------------
 
 def main(request):
+        # Obtiene el usuario que ha iniciado sesión.
         user_login = request.user
+        
+        # Si el usuario está autenticado, recupera sus proyectos y renderiza la página principal.
         if user_login.is_authenticated:
                 user = User.objects.get(id=user_login.id)
                 proyectos = Proyecto.objects.filter(user=user)
                 return render(request, 'main.html', {'proyectos': proyectos})
-
         else:
-                
+                # Si el usuario no está autenticado, devuelve un mensaje de error.
                 return HttpResponse('Usuario no autenticado')
 
-
 def crear_proyecto(request):
+        # Si el método de la solicitud es POST, crea un nuevo proyecto.
         if request.method == 'POST':
                 nombre = request.POST['nombre']
                 descripcion = request.POST['descripcion']
                 categoria = request.POST['categoria']
-                imagen = request.FILES.get('imagen')  # Usa .get() en lugar de ['imagen']
-                if imagen:  # Verifica si se proporcionó una imagen
+                imagen = request.FILES.get('imagen')  # Usa .get() en lugar de ['imagen'] para evitar errores si no se proporciona una imagen.
+                
+                # Crea el proyecto con o sin imagen.
+                if imagen:
                         proyecto = Proyecto(nombre=nombre, descripcion=descripcion, categoria=categoria, imagen=imagen, user=request.user)
                 else:
                         proyecto = Proyecto(nombre=nombre, descripcion=descripcion, categoria=categoria, user=request.user)
+                
+                # Guarda el proyecto en la base de datos y redirige a la página principal.
                 proyecto.save()
                 return redirect('/main/')
+        
+        # Si el método de la solicitud no es POST, renderiza el formulario de creación de proyecto.
         return render(request, 'proyecto/form_proyecto.html', {})
+
 
 #-------------ia generador de logo----------------
 def generador_logo(request):
+        # Si el método de la solicitud es POST, genera un logo usando la API de OpenAI.
         if request.method == 'POST':
                 nombre = request.POST.get('nombre')
                 descripcion = request.POST.get('descripcion')
 
-        
+                # Inicializa el cliente de OpenAI con la clave API.
                 client = OpenAI(api_key=key)
+                
+                # Define el parámetro para la generación del logo.
                 parametro = "a logo for a technology company named " + nombre + " that is modern and techy. description: " + descripcion
 
+                # Genera la imagen usando el modelo DALL-E.
                 response = client.images.generate(
                 model="dall-e-3",
                 prompt=parametro,
@@ -167,77 +202,125 @@ def generador_logo(request):
                 n=1,
                 )
 
+                # Obtiene la URL de la imagen generada.
                 image_url = response.data[0].url
                 print(image_url)
+                
+                # Redirige a la página de creación de proyecto con la URL de la imagen.
                 return redirect(reverse('crear_proyecto'), {'image_url': image_url})
         else:
+                # Si el método de la solicitud no es POST, renderiza el formulario de generación de logos.
                 return render(request, 'proyecto/generador_logo.html', {})
 
 def editar_proyecto(request, proyecto_id):
+        # Obtiene el usuario que ha iniciado sesión.
         user_login = request.user
+        
+        # Si el usuario está autenticado, permite la edición del proyecto.
         if user_login.is_authenticated:
                 user = User.objects.get(id=user_login.id)
                 proyecto = Proyecto.objects.get(id=proyecto_id)
+                
+                # Si el método de la solicitud es POST, actualiza la información del proyecto.
                 if request.method == 'POST':
                         proyecto_id = request.POST['proyecto_id']
                         proyecto.nombre = request.POST['nombre']
                         proyecto.descripcion = request.POST['descripcion']
                         proyecto.categoria = request.POST['categoria']
                         proyecto.save()
+                        
+                        # Redirige a la página principal después de guardar los cambios.
                         return redirect('/main/')
+                
+                # Renderiza la página de edición del proyecto.
                 return render(request, 'proyecto/editar_proyecto.html', {'proyecto': proyecto})
 
 def eliminar_proyecto(request, proyecto_id):
+        # Elimina el proyecto especificado por ID.
         proyecto = Proyecto.objects.get(id=proyecto_id)
         proyecto.delete()
+        
+        # Redirige a la página principal después de eliminar el proyecto.
         return redirect('/main/')
 
 
+
 #-------------GESTION DE PROYECTO----------------
+
+# Esta función gestiona un proyecto identificado por su ID.
+# Recibe una solicitud (request) y el ID del proyecto (proyecto_id).
 def gestionar_proyecto(request, proyecto_id):
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-        return render(request, 'proyecto/gestionar_proyecto.html', {'proyecto': proyecto})
+    # Obtiene el proyecto con el ID dado desde la base de datos.
+    proyecto = Proyecto.objects.get(id=proyecto_id)
+    # Renderiza la plantilla 'proyecto/gestionar_proyecto.html' y pasa el proyecto como contexto.
+    return render(request, 'proyecto/gestionar_proyecto.html', {'proyecto': proyecto})
 
-#-------------FINANCIERO---------------------- 
+# Esta función maneja la sección financiera de un proyecto.
+# Recibe una solicitud (request) y el ID del proyecto (proyecto_id).
 def financiero(request, proyecto_id):
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-        financieros = Financiero.objects.filter(proyecto_id=proyecto_id)
-        financiero_exists = Financiero.objects.filter(proyecto_id=proyecto_id).exists()
-        if financiero_exists:
-                financiero = Financiero.objects.get(proyecto_id=proyecto_id)
-                flujo_caja = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo - financiero.costos_produccion - financiero.gastos_administrativos
-                ingresos = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo
-                egresos = financiero.costos_produccion + financiero.gastos_administrativos
+    # Obtiene el proyecto con el ID dado desde la base de datos.
+    proyecto = Proyecto.objects.get(id=proyecto_id)
+    # Obtiene todos los registros financieros asociados con el proyecto.
+    financieros = Financiero.objects.filter(proyecto_id=proyecto_id)
+    # Verifica si existe al menos un registro financiero asociado con el proyecto.
+    financiero_exists = Financiero.objects.filter(proyecto_id=proyecto_id).exists()
 
-        else:
-                financiero = None
-                flujo_caja = None
-                ingresos = None
-                egresos = None
-        return render(request, 'proyecto/modulos/financiero/financiero.html', {'proyecto': proyecto, 'financiero': financiero, 'financieros':financieros ,'financiero_exists': financiero_exists,'flujo_caja':flujo_caja, 'ingresos': ingresos, 'egresos': egresos})
+    # Si hay registros financieros asociados:
+    if financiero_exists:
+        # Obtiene el primer registro financiero asociado con el proyecto.
+        financiero = Financiero.objects.get(proyecto_id=proyecto_id)
+        # Calcula el flujo de caja restando costos de ingresos.
+        flujo_caja = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo - financiero.costos_produccion - financiero.gastos_administrativos
+        # Calcula los ingresos sumando diferentes fuentes de financiamiento.
+        ingresos = financiero.ventas + financiero.capital_propio + financiero.inversores + financiero.prestamo
+        # Calcula los egresos sumando costos de producción y gastos administrativos.
+        egresos = financiero.costos_produccion + financiero.gastos_administrativos
+    else:
+        # Si no hay registros financieros, se establecen los valores a None.
+        financiero = None
+        flujo_caja = None
+        ingresos = None
+        egresos = None
 
+    # Renderiza la plantilla 'proyecto/modulos/financiero/financiero.html' y pasa el contexto con los datos financieros.
+    return render(request, 'proyecto/modulos/financiero/financiero.html', {'proyecto': proyecto, 'financiero': financiero, 'financieros':financieros ,'financiero_exists': financiero_exists,'flujo_caja':flujo_caja, 'ingresos': ingresos, 'egresos': egresos})
+
+
+# Vista para mostrar todos los registros financieros
 def financieros(request):
-        financiero = Financiero.objects.all()
-        return render(request, 'proyecto/modulos/financiero/financiero.html', {'financiero': financiero})
+    # Obtiene todos los registros financieros de la base de datos
+    financiero = Financiero.objects.all()
+    # Renderiza la plantilla 'proyecto/modulos/financiero/financiero.html' con el contexto de los registros financieros
+    return render(request, 'proyecto/modulos/financiero/financiero.html', {'financiero': financiero})
 
+# Vista para mostrar el formulario de ingreso de datos financieros y guardarlos
 def form_financiero(request, proyecto_id):
-        proyecto = Proyecto.objects.get(id=proyecto_id)
-        cargo_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
-        total_salario = CargoEmpleado.objects.aggregate(total_salarios=Sum(F('salario') * F('numero_empleados')))['total_salarios']
-        total_salarios = total_salario * 12
-        if request.method == 'POST':
-                #proyecto_id = request.POST['proyecto_id']
-                #proyecto = Proyecto.objects.get(id=proyecto_id)
-                ventas = request.POST['ventas']
-                costos_produccion = request.POST['costos_produccion']
-                gastos_administrativos = request.POST['gastos_administrativos']
-                capital_propio = request.POST['capital_propio']
-                prestamo = request.POST['prestamo']
-                inversores = request.POST['inversores']
-                financiero = Financiero(proyecto=proyecto, ventas=ventas, costos_produccion=costos_produccion, gastos_administrativos=gastos_administrativos, capital_propio=capital_propio, prestamo=prestamo, inversores=inversores)
-                financiero.save()
-                return redirect(reverse('financiero', args=[proyecto.id]))
-        return render(request, 'proyecto/modulos/financiero/form_financiero.html', {'proyecto': proyecto, 'cargo_empleados': cargo_empleados, 'total_salarios': total_salarios})
+    # Obtiene el proyecto con el ID dado desde la base de datos
+    proyecto = Proyecto.objects.get(id=proyecto_id)
+    # Obtiene los cargos de empleados asociados al proyecto
+    cargo_empleados = CargoEmpleado.objects.filter(proyecto_id=proyecto_id)
+    # Calcula el total de salarios multiplicando el salario por el número de empleados y por 12 meses
+    total_salario = CargoEmpleado.objects.aggregate(total_salarios=Sum(F('salario') * F('numero_empleados')))['total_salarios']
+    total_salarios = total_salario * 12
+    
+    # Verifica si se ha enviado el formulario por el método POST
+    if request.method == 'POST':
+        # Obtiene los datos ingresados en el formulario
+        ventas = request.POST['ventas']
+        costos_produccion = request.POST['costos_produccion']
+        gastos_administrativos = request.POST['gastos_administrativos']
+        capital_propio = request.POST['capital_propio']
+        prestamo = request.POST['prestamo']
+        inversores = request.POST['inversores']
+        # Crea un nuevo registro financiero con los datos ingresados
+        financiero = Financiero(proyecto=proyecto, ventas=ventas, costos_produccion=costos_produccion, gastos_administrativos=gastos_administrativos, capital_propio=capital_propio, prestamo=prestamo, inversores=inversores)
+        financiero.save()
+        # Redirige a la vista 'financiero' para mostrar los registros financieros actualizados
+        return redirect(reverse('financiero', args=[proyecto.id]))
+    
+    # Renderiza la plantilla 'proyecto/modulos/financiero/form_financiero.html' con el contexto del proyecto, cargos de empleados y total de salarios
+    return render(request, 'proyecto/modulos/financiero/form_financiero.html', {'proyecto': proyecto, 'cargo_empleados': cargo_empleados, 'total_salarios': total_salarios})
+
 
 def edit_financiero(request, proyecto_id, financiero_id):
         proyecto = Proyecto.objects.get(id=proyecto_id)
