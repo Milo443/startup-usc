@@ -56,21 +56,33 @@ def signup(request):
         #Fin de SignUp
 
 def user_login(request):
+        #Si el método de la solicitud es GET, renderiza la página de inicio de sesión con el formulario de autenticación.
         if request.method == 'GET':
                 return render(request, 'login.html', {'form': AuthenticationForm})
         else:
+                
+                #Obtiene el nombre de usuario y la contraseña del formulario enviado.
                 #email = request.POST['email']
                 username = request.POST['username']
                 password = request.POST['password']
+                
+                #Autentica al usuario con las credenciales proporcionadas.
                 user = authenticate(username=username, password=password)
+                
+                #Si la autenticación es exitosa, verifica si el usuario es personal administrativo.
                 if user is not None:
                         staff = user.is_staff
+                        
+                        #Si el usuario es personal administrativo, redirige a la página del administrador.
                         if staff:
                                 return redirect('/administrator/')
                         else:
+                                
+                                ## Si no es personal administrativo, inicia sesión y redirige a la página principal.
                                 login(request, user)
                                 return redirect('/main/')
                 else:
+                        #Si la autenticación falla, muestra un mensaje de error y redirige a la página de inicio de sesión.
                         messages.error(request, 'Usuario o contraseña incorrecta')
                         return redirect('/login/')
 def logout(request):
